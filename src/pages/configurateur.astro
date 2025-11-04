@@ -3,7 +3,39 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Configurateur - TaVue" description="Créez vos lunettes personnalisées en quelques clics">
-	<div class="min-h-screen bg-base-100 py-8">
+	<!-- Modal de connexion requise (visible par défaut) -->
+	<div id="auth-modal" class="modal modal-open">
+		<div class="modal-box relative max-w-md mx-auto">
+			<!-- Bouton de fermeture -->
+			<button 
+				class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" 
+				onclick="window.location.href='/'"
+				aria-label="Fermer"
+			>
+				✕
+			</button>
+			
+			<h3 class="font-bold text-xl mb-4">Connexion requise</h3>
+			<p class="py-4 text-base">
+				Vous devez être connecté pour accéder au configurateur de lunettes et créer vos modèles personnalisés.
+			</p>
+			
+			<div class="modal-action justify-center gap-3">
+				<a href="/inscription?returnUrl=/configurateur" class="btn btn-primary">
+					Créer un compte
+				</a>
+				<a href="/connexion?returnUrl=/configurateur" class="btn btn-outline">
+					Se connecter
+				</a>
+			</div>
+		</div>
+		<form method="dialog" class="modal-backdrop bg-black/50" onclick="window.location.href='/'">
+			<button>close</button>
+		</form>
+	</div>
+
+	<!-- Contenu du configurateur (caché par défaut) -->
+	<div class="min-h-screen bg-base-100 py-8" id="configurator-content" style="display: none; visibility: hidden;">
 		<div class="max-w-7xl mx-auto px-6">
 			<!-- Header -->
 			<div class="text-center mb-8">
@@ -594,7 +626,58 @@ import Layout from '../layouts/Layout.astro';
 		setInterval(() => {
 			count = Math.floor(Math.random() * 50) + 300;
 			const countEl = document.getElementById('config-count');
-			if (countEl) countEl.textContent = count;
+			if (countEl) countEl.textContent = count.toString();
 		}, 5000);
+
+		// Protection de la page - Vérifier l'authentification
+		import { isAuthenticated, pb } from '../JS/pocketbase.js';
+
+		const authModal = document.getElementById('auth-modal') as HTMLDialogElement;
+		const configuratorContent = document.getElementById('configurator-content');
+
+		// Fonction pour vérifier et afficher le contenu approprié
+		function checkAuth() {
+			console.log('🔍 Vérification de l\'authentification...');
+			console.log('🔍 Auth valid?', pb.authStore.isValid);
+			console.log('🔍 User:', pb.authStore.model);
+			
+			if (!isAuthenticated()) {
+				console.log('❌ Non connecté - Affichage du modal');
+				// S'assurer que le modal est affiché
+				if (authModal) {
+					authModal.classList.add('modal-open');
+					authModal.style.display = 'flex';
+				}
+				// S'assurer que le contenu est masqué
+				if (configuratorContent) {
+					configuratorContent.style.display = 'none';
+					configuratorContent.style.visibility = 'hidden';
+				}
+			} else {
+				console.log('✅ Connecté - Affichage du configurateur');
+				// Masquer le modal complètement
+				if (authModal) {
+					authModal.classList.remove('modal-open');
+					authModal.style.display = 'none';
+				}
+				// Afficher le configurateur
+				if (configuratorContent) {
+					configuratorContent.style.display = 'block';
+					configuratorContent.style.visibility = 'visible';
+				}
+			}
+		}
+
+		// Vérifier immédiatement au chargement
+		checkAuth();
+
+		// Re-vérifier après un court délai (pour s'assurer que localStorage est chargé)
+		setTimeout(checkAuth, 50);
+
+		// Écouter les changements d'authentification
+		pb.authStore.onChange(() => {
+			console.log('🔄 Changement d\'authentification détecté');
+			checkAuth();
+		});
 	</script>
 </Layout>

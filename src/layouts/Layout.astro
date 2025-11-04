@@ -43,12 +43,37 @@ const {
 			<div class="navbar-center hidden lg:flex">
 				<ul class="menu menu-horizontal px-1 gap-2">
 					<li><a href="/#presentation" class="text-base-content hover:text-primary">Présentation</a></li>
-					<li><a href="/configurateur" class="text-base-content hover:text-primary">Configurer</a></li>
+					<li>
+						<a href="/configurateur" class="text-base-content hover:text-primary flex items-center gap-2">
+							Configurer
+							<span id="config-badge" class="badge badge-sm badge-primary hidden">Nouveau</span>
+						</a>
+					</li>
 					<li><a href="/#creations" class="text-base-content hover:text-primary">Tes créations</a></li>
 				</ul>
 			</div>
 			<div class="navbar-end gap-2">
-				<a href="/connexion" class="btn btn-ghost text-base-content">Connexion</a>
+				<!-- User menu (hidden by default, shown when logged in) -->
+				<div id="user-menu" class="hidden dropdown dropdown-end">
+					<label tabindex="0" class="btn btn-ghost btn-circle avatar">
+						<div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
+							<span id="user-initial" class="text-lg font-bold">U</span>
+						</div>
+					</label>
+					<ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+						<li class="menu-title">
+							<span id="user-name-display">Utilisateur</span>
+						</li>
+						<li><a href="/configurateur">Configurer mes lunettes</a></li>
+						<li><a href="/#creations">Mes créations</a></li>
+						<li><a href="#" id="logout-btn">Déconnexion</a></li>
+					</ul>
+				</div>
+
+				<!-- Login button (shown when not logged in) -->
+				<a href="/connexion" id="login-btn" class="btn btn-ghost text-base-content">Connexion</a>
+
+				<!-- Mobile menu -->
 				<div class="dropdown dropdown-end lg:hidden">
 					<label tabindex="0" class="btn btn-ghost lg:hidden">
 						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -141,11 +166,55 @@ const {
 		</button>
 
 		<script>
+			import { pb, isAuthenticated, getCurrentUser, logout } from '../JS/pocketbase.js';
+
+			// Vérifier et afficher l'état de connexion
+			function updateAuthUI() {
+				const userMenu = document.getElementById('user-menu');
+				const loginBtn = document.getElementById('login-btn');
+				const userNameDisplay = document.getElementById('user-name-display');
+				const userInitial = document.getElementById('user-initial');
+
+				if (isAuthenticated()) {
+					const user = getCurrentUser();
+					if (user && userMenu && loginBtn && userNameDisplay && userInitial) {
+						// Afficher le menu utilisateur
+						userMenu.classList.remove('hidden');
+						loginBtn.classList.add('hidden');
+
+						// Mettre à jour le nom et l'initiale
+						userNameDisplay.textContent = user.name || user.email;
+						userInitial.textContent = (user.name || user.email || 'U')[0].toUpperCase();
+					}
+				} else {
+					// Afficher le bouton de connexion
+					if (userMenu && loginBtn) {
+						userMenu.classList.add('hidden');
+						loginBtn.classList.remove('hidden');
+					}
+				}
+			}
+
+			// Gérer la déconnexion
+			const logoutBtn = document.getElementById('logout-btn');
+			logoutBtn?.addEventListener('click', (e) => {
+				e.preventDefault();
+				logout();
+			});
+
+			// Mettre à jour l'UI au chargement
+			updateAuthUI();
+
+			// Écouter les changements d'authentification
+			pb.authStore.onChange(() => {
+				updateAuthUI();
+			});
+
 			// Smooth scroll for navigation links
 			document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-				anchor.addEventListener('click', function (e) {
+				anchor.addEventListener('click', function (this: HTMLAnchorElement, e: Event) {
 					e.preventDefault();
-					const target = document.querySelector(this.getAttribute('href'));
+					const target = document.querySelector(this.getAttribute('href') || '');
 					if (target) {
 						target.scrollIntoView({
 							behavior: 'smooth',
