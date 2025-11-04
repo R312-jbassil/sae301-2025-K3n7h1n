@@ -165,3 +165,74 @@ export async function requestPasswordReset(email) {
     throw error;
   }
 }
+
+// Sauvegarder une configuration de lunettes
+export async function saveLunette(lunetteData) {
+  try {
+    console.log('💾 Sauvegarde de la lunette:', lunetteData);
+    
+    // Vérifier que l'utilisateur est connecté
+    if (!pb.authStore.model) {
+      throw new Error('Vous devez être connecté pour sauvegarder une lunette');
+    }
+    
+    const data = {
+      nom_modele: lunetteData.signature,
+      largeur_pont_mm: lunetteData.largeurPont || null,
+      largeur_verre_mm: lunetteData.largeurVerre || null,
+      hauteur_verre_mm: lunetteData.hauteurVerre || null,
+      longueur_branche_mm: lunetteData.longueurBranche || null,
+      taille_monture: lunetteData.size || null,
+      couleur_monture_hex: lunetteData.colors.monture || '#000000',
+      couleur_branche_hex: lunetteData.colors.branches || '#000000',
+      couleur_verre_hex: lunetteData.colors.verres || '#000000',
+      prix: lunetteData.prix || 0,
+      user: pb.authStore.model.id // Lier à l'utilisateur connecté
+    };
+    
+    const record = await pb.collection('lunette').create(data);
+    console.log('✅ Lunette sauvegardée:', record);
+    return record;
+  } catch (error) {
+    console.error('❌ Erreur de sauvegarde:', error);
+    throw error;
+  }
+}
+
+// Récupérer toutes les lunettes de l'utilisateur
+export async function getUserLunettes() {
+  try {
+    const records = await pb.collection('lunette').getFullList({
+      sort: '-created',
+    });
+    return records;
+  } catch (error) {
+    console.error('Erreur de récupération des lunettes:', error);
+    throw error;
+  }
+}
+
+// Supprimer une lunette
+export async function deleteLunette(id) {
+  try {
+    await pb.collection('lunette').delete(id);
+    console.log('🗑️ Lunette supprimée:', id);
+  } catch (error) {
+    console.error('Erreur de suppression:', error);
+    throw error;
+  }
+}
+
+// Récupérer tous les matériaux
+export async function getMateriaux() {
+  try {
+    const records = await pb.collection('materiau').getFullList({
+      sort: 'prix',
+    });
+    console.log('📦 Matériaux récupérés:', records);
+    return records;
+  } catch (error) {
+    console.error('❌ Erreur de récupération des matériaux:', error);
+    throw error;
+  }
+}

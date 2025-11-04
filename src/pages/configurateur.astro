@@ -61,12 +61,13 @@ import Layout from '../layouts/Layout.astro';
 
 			<!-- Progress Steps -->
 			<div class="mb-8">
-				<ul class="steps steps-horizontal w-full">
-					<li class="step step-primary" data-step="0">Choisir l'édition</li>
-					<li class="step" data-step="1">Sélectionner le matériau</li>
-					<li class="step" data-step="2">Ajuster la morphologie</li>
-					<li class="step" data-step="3">Personnaliser les couleurs</li>
-					<li class="step" data-step="4">Signer votre création</li>
+				<ul class="steps steps-horizontal w-full text-xs">
+					<li class="step step-primary" data-step="0">Édition</li>
+					<li class="step" data-step="1">Matériau</li>
+					<li class="step" data-step="2">Taille</li>
+					<li class="step" data-step="3">Dimensions</li>
+					<li class="step" data-step="4">Couleurs</li>
+					<li class="step" data-step="5">Signature</li>
 				</ul>
 			</div>
 
@@ -140,71 +141,13 @@ import Layout from '../layouts/Layout.astro';
 
 					<!-- Step 1: Sélectionner le matériau -->
 					<div id="step-1" class="step-content hidden">
-						<h2 class="text-2xl font-bold mb-4">Étape 2 sur 5<br/><span class="text-primary">Sélectionnez le matériau</span></h2>
+						<h2 class="text-2xl font-bold mb-4">Étape 2 sur 6<br/><span class="text-primary">Sélectionnez le matériau</span></h2>
 						<p class="text-neutral mb-6">Chaque matériau offre une expérience unique</p>
 						
-						<div class="space-y-4">
-							<!-- Acétate -->
-							<div class="card bg-base-200 border-2 border-primary cursor-pointer transition-all material-card selected" data-material="acetate" data-price="0">
-								<div class="card-body">
-									<div class="flex justify-between items-start">
-										<div>
-											<h3 class="font-bold text-lg flex items-center gap-2">
-												Acétate
-												<span class="badge badge-error badge-sm">🔥 Plus vendu</span>
-											</h3>
-											<p class="text-sm text-neutral">Confort visuel et au quotidien</p>
-										</div>
-										<div class="text-right">
-											<p class="text-2xl font-bold">+0 €</p>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Métal -->
-							<div class="card bg-base-200 border-2 border-transparent hover:border-primary cursor-pointer transition-all material-card" data-material="metal" data-price="30">
-								<div class="card-body">
-									<div class="flex justify-between items-start">
-										<div>
-											<h3 class="font-bold text-lg">Métal</h3>
-											<p class="text-sm text-neutral">Finesse et légèreté absolue</p>
-										</div>
-										<div class="text-right">
-											<p class="text-2xl font-bold">+30 €</p>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Titane -->
-							<div class="card bg-base-200 border-2 border-transparent hover:border-primary cursor-pointer transition-all material-card" data-material="titanium" data-price="50">
-								<div class="card-body">
-									<div class="flex justify-between items-start">
-										<div>
-											<h3 class="font-bold text-lg">Titane</h3>
-											<p class="text-sm text-neutral">Performance et résistance</p>
-										</div>
-										<div class="text-right">
-											<p class="text-2xl font-bold">+50 €</p>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Bois -->
-							<div class="card bg-base-200 border-2 border-transparent hover:border-primary cursor-pointer transition-all material-card" data-material="wood" data-price="70">
-								<div class="card-body">
-									<div class="flex justify-between items-start">
-										<div>
-											<h3 class="font-bold text-lg">Bois</h3>
-											<p class="text-sm text-neutral">Essence noble et durable</p>
-										</div>
-										<div class="text-right">
-											<p class="text-2xl font-bold">+70 €</p>
-										</div>
-									</div>
-								</div>
+						<div id="materials-container" class="space-y-4">
+							<!-- Les matériaux seront chargés dynamiquement depuis PocketBase -->
+							<div class="flex justify-center py-8">
+								<span class="loading loading-spinner loading-lg"></span>
 							</div>
 						</div>
 
@@ -214,12 +157,12 @@ import Layout from '../layouts/Layout.astro';
 						</div>
 					</div>
 
-					<!-- Step 2: Ajuster la morphologie -->
+					<!-- Step 2: Choisir la taille -->
 					<div id="step-2" class="step-content hidden">
-						<h2 class="text-2xl font-bold mb-4">Étape 3 sur 5<br/><span class="text-primary">Ajustez à votre morphologie</span></h2>
-						<p class="text-neutral mb-6">Nous recommandons la taille M pour la plupart des visages</p>
+						<h2 class="text-2xl font-bold mb-4">Étape 3 sur 6<br/><span class="text-primary">Choisissez votre taille</span></h2>
+						<p class="text-neutral mb-6">Sélectionnez la taille globale de la monture selon votre morphologie</p>
 						
-						<div class="space-y-4">
+						<div class="grid grid-cols-1 gap-4">
 							<!-- Visage Fin -->
 							<div class="card bg-base-200 border-2 border-transparent hover:border-primary cursor-pointer transition-all size-card" data-size="S" data-width="48">
 								<div class="card-body">
@@ -229,29 +172,27 @@ import Layout from '../layouts/Layout.astro';
 												<span class="text-xl">S</span>
 											</div>
 										</div>
-										<div class="flex-1">
-											<h3 class="font-bold">Visage fin</h3>
-											<p class="text-sm text-neutral">Largeur: 48mm</p>
+										<div>
+											<h3 class="font-bold">Petit - 48mm</h3>
+											<p class="text-sm text-neutral">Visage fin</p>
 										</div>
 									</div>
 								</div>
 							</div>
 
-							<!-- Standard -->
-							<div class="card bg-base-200 border-2 border-primary cursor-pointer transition-all size-card selected" data-size="M" data-width="52">
+							<!-- Visage Standard -->
+							<div class="card bg-base-200 border-2 border-transparent hover:border-primary cursor-pointer transition-all size-card" data-size="M" data-width="52">
 								<div class="card-body">
 									<div class="flex items-center gap-4">
 										<div class="avatar placeholder">
-											<div class="bg-primary text-primary-content rounded-full w-12">
+											<div class="bg-neutral text-neutral-content rounded-full w-12">
 												<span class="text-xl">M</span>
 											</div>
 										</div>
-										<div class="flex-1">
-											<h3 class="font-bold flex items-center gap-2">
-												Standard
-												<span class="badge badge-sm">Recommandé</span>
-											</h3>
-											<p class="text-sm text-neutral">Largeur: 52mm</p>
+										<div>
+											<h3 class="font-bold">Moyen - 52mm</h3>
+											<p class="text-sm text-neutral">Visage standard</p>
+											<span class="badge badge-sm badge-primary">Recommandé</span>
 										</div>
 									</div>
 								</div>
@@ -266,19 +207,113 @@ import Layout from '../layouts/Layout.astro';
 												<span class="text-xl">L</span>
 											</div>
 										</div>
-										<div class="flex-1">
-											<h3 class="font-bold">Visage large</h3>
-											<p class="text-sm text-neutral">Largeur: 56mm</p>
+										<div>
+											<h3 class="font-bold">Grand - 56mm</h3>
+											<p class="text-sm text-neutral">Visage large</p>
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
+
+						<div class="alert alert-info mt-6">
+							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+							<span class="text-sm">💡 La taille M convient à la majorité des morphologies. Vous pourrez affiner les dimensions à l'étape suivante.</span>
+						</div>
 					</div>
 
-					<!-- Step 3: Personnaliser les couleurs -->
+					<!-- Step 3: Dimensions détaillées -->
 					<div id="step-3" class="step-content hidden">
-						<h2 class="text-2xl font-bold mb-4">Étape 4 sur 5<br/><span class="text-primary">Personnalisez les teintes</span></h2>
+						<h2 class="text-2xl font-bold mb-4">Étape 4 sur 6<br/><span class="text-primary">Affinez les dimensions</span></h2>
+						<p class="text-neutral mb-6">Personnalisez les mesures précises de vos lunettes (en millimètres)</p>
+						
+						<div class="grid grid-cols-1 gap-4">
+							<!-- Largeur du pont -->
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-semibold">Largeur du pont (mm)</span>
+									<span class="label-text-alt text-neutral">Distance entre les verres</span>
+								</label>
+								<input 
+									type="number" 
+									id="largeur-pont-input"
+									placeholder="Ex: 18" 
+									min="14"
+									max="24"
+									class="input input-bordered w-full"
+								/>
+								<label class="label">
+									<span class="label-text-alt">Recommandé: 16-20mm</span>
+								</label>
+							</div>
+
+							<!-- Largeur du verre -->
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-semibold">Largeur du verre (mm)</span>
+									<span class="label-text-alt text-neutral">Largeur de chaque verre</span>
+								</label>
+								<input 
+									type="number" 
+									id="largeur-verre-input"
+									placeholder="Ex: 52" 
+									min="45"
+									max="60"
+									class="input input-bordered w-full"
+								/>
+								<label class="label">
+									<span class="label-text-alt">Recommandé: 48-56mm</span>
+								</label>
+							</div>
+
+							<!-- Hauteur du verre -->
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-semibold">Hauteur du verre (mm)</span>
+									<span class="label-text-alt text-neutral">Hauteur de chaque verre</span>
+								</label>
+								<input 
+									type="number" 
+									id="hauteur-verre-input"
+									placeholder="Ex: 40" 
+									min="30"
+									max="55"
+									class="input input-bordered w-full"
+								/>
+								<label class="label">
+									<span class="label-text-alt">Recommandé: 35-45mm</span>
+								</label>
+							</div>
+
+							<!-- Longueur de la branche -->
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-semibold">Longueur branche (mm)</span>
+									<span class="label-text-alt text-neutral">Longueur totale des branches</span>
+								</label>
+								<input 
+									type="number" 
+									id="longueur-branche-input"
+									placeholder="Ex: 145" 
+									min="130"
+									max="155"
+									class="input input-bordered w-full"
+								/>
+								<label class="label">
+									<span class="label-text-alt">Recommandé: 140-150mm</span>
+								</label>
+							</div>
+						</div>
+
+						<div class="alert alert-info mt-6">
+							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+							<span class="text-sm">Les dimensions détaillées sont optionnelles. Si non renseignées, nous utiliserons les dimensions standards selon la taille choisie.</span>
+						</div>
+					</div>
+
+					<!-- Step 4: Personnaliser les couleurs -->
+					<div id="step-4" class="step-content hidden">
+						<h2 class="text-2xl font-bold mb-4">Étape 5 sur 6<br/><span class="text-primary">Personnalisez les teintes</span></h2>
 						<p class="text-neutral mb-6">Exprimez votre style personnel</p>
 						
 						<!-- Couleur de la monture -->
@@ -321,9 +356,9 @@ import Layout from '../layouts/Layout.astro';
 						</div>
 					</div>
 
-					<!-- Step 4: Signer la création -->
-					<div id="step-4" class="step-content hidden">
-						<h2 class="text-2xl font-bold mb-4">Étape 5 sur 5<br/><span class="text-primary">Signez votre création</span></h2>
+					<!-- Step 5: Signer la création -->
+					<div id="step-5" class="step-content hidden">
+						<h2 class="text-2xl font-bold mb-4">Étape 6 sur 6<br/><span class="text-primary">Signez votre création</span></h2>
 						<p class="text-neutral mb-6">Donnez vie à vos lunettes avec un nom personnel. Cette signature apparaîtra sur votre modèle.</p>
 						
 						<div class="form-control mb-6">
@@ -437,7 +472,7 @@ import Layout from '../layouts/Layout.astro';
 	<script>
 		// Configuration state
 		let currentStep = 0;
-		const totalSteps = 5;
+		const totalSteps = 6;
 		let config = {
 			edition: 'classique',
 			editionPrice: 159,
@@ -445,6 +480,10 @@ import Layout from '../layouts/Layout.astro';
 			materialPrice: 0,
 			size: 'M',
 			sizeWidth: 52,
+			largeurPont: null as number | null,
+			largeurVerre: null as number | null,
+			hauteurVerre: null as number | null,
+			longueurBranche: null as number | null,
 			colors: {
 				monture: '#000000',
 				branches: '#000000',
@@ -462,6 +501,85 @@ import Layout from '../layouts/Layout.astro';
 		// Initialize
 		updateStepDisplay();
 		updatePrice();
+		loadMaterials(); // Charger les matériaux depuis PocketBase
+
+		// Fonction pour charger les matériaux depuis PocketBase
+		import { getMateriaux } from '../JS/pocketbase.js';
+		
+		async function loadMaterials() {
+			const container = document.getElementById('materials-container');
+			if (!container) return;
+
+			try {
+				const materiaux = await getMateriaux();
+				
+				if (materiaux.length === 0) {
+					container.innerHTML = '<p class="text-center text-neutral">Aucun matériau disponible</p>';
+					return;
+				}
+
+				container.innerHTML = '';
+				
+				materiaux.forEach((materiau, index) => {
+					const isFirst = index === 0;
+					const card = document.createElement('div');
+					card.className = `card bg-base-200 border-2 ${isFirst ? 'border-4 border-primary' : 'border-transparent hover:border-primary'} cursor-pointer transition-all material-card`;
+					card.setAttribute('data-material', materiau.libelle.toLowerCase());
+					card.setAttribute('data-price', materiau.prix.toString());
+					
+					card.innerHTML = `
+						<div class="card-body">
+							<div class="flex justify-between items-start">
+								<div>
+									<h3 class="font-bold text-lg flex items-center gap-2">
+										${materiau.libelle}
+										${isFirst ? '<span class="badge badge-error badge-sm">🔥 Plus vendu</span>' : ''}
+									</h3>
+									<p class="text-sm text-neutral">${materiau.description || 'Matériau de qualité'}</p>
+								</div>
+								<div class="text-right">
+									<p class="text-2xl font-bold">+${materiau.prix} €</p>
+								</div>
+							</div>
+						</div>
+					`;
+					
+					container.appendChild(card);
+					
+					// Si c'est le premier matériau, le définir par défaut
+					if (isFirst) {
+						config.material = materiau.libelle.toLowerCase();
+						config.materialPrice = materiau.prix;
+					}
+				});
+				
+				// Attacher les event listeners après avoir créé les cartes
+				attachMaterialListeners();
+				
+			} catch (error) {
+				console.error('Erreur de chargement des matériaux:', error);
+				container.innerHTML = '<p class="text-center text-error">Erreur de chargement des matériaux</p>';
+			}
+		}
+
+		// Fonction pour attacher les listeners aux cartes de matériaux
+		function attachMaterialListeners() {
+			document.querySelectorAll('.material-card').forEach(card => {
+				card.addEventListener('click', () => {
+					document.querySelectorAll('.material-card').forEach(c => {
+						c.classList.remove('border-primary', 'border-4');
+						c.classList.add('border-2', 'border-transparent');
+					});
+					card.classList.remove('border-2', 'border-transparent');
+					card.classList.add('border-4', 'border-primary');
+					
+					const cardElement = card as HTMLElement;
+					config.material = cardElement.dataset.material || '';
+					config.materialPrice = parseInt(cardElement.dataset.price || '0');
+					updatePrice();
+				});
+			});
+		}
 
 		// Navigation
 		prevBtn?.addEventListener('click', () => {
@@ -518,39 +636,71 @@ import Layout from '../layouts/Layout.astro';
 		document.querySelectorAll('.edition-card').forEach(card => {
 			card.addEventListener('click', () => {
 				document.querySelectorAll('.edition-card').forEach(c => {
-					c.classList.remove('border-primary', 'selected');
+					c.classList.remove('border-primary', 'border-4');
+					c.classList.add('border-2', 'border-transparent');
 				});
-				card.classList.add('border-primary', 'selected');
+				card.classList.remove('border-2', 'border-transparent');
+				card.classList.add('border-4', 'border-primary');
 				config.edition = card.dataset.edition;
 				config.editionPrice = parseInt(card.dataset.price);
 				updatePrice();
 			});
 		});
 
-		// Material selection
-		document.querySelectorAll('.material-card').forEach(card => {
-			card.addEventListener('click', () => {
-				document.querySelectorAll('.material-card').forEach(c => {
-					c.classList.remove('border-primary', 'selected');
-				});
-				card.classList.add('border-primary', 'selected');
-				config.material = card.dataset.material;
-				config.materialPrice = parseInt(card.dataset.price);
-				updatePrice();
-			});
-		});
+		// Material selection est gérée par attachMaterialListeners() appelée après le chargement dynamique
 
 		// Size selection
 		document.querySelectorAll('.size-card').forEach(card => {
 			card.addEventListener('click', () => {
 				document.querySelectorAll('.size-card').forEach(c => {
-					c.classList.remove('border-primary', 'selected');
+					c.classList.remove('border-primary', 'border-4');
+					c.classList.add('border-2', 'border-transparent');
 				});
-				card.classList.add('border-primary', 'selected');
-				config.size = card.dataset.size;
-				config.sizeWidth = card.dataset.width;
+				card.classList.remove('border-2', 'border-transparent');
+				card.classList.add('border-4', 'border-primary');
+				const cardElement = card as HTMLElement;
+				config.size = cardElement.dataset.size || '';
+				config.sizeWidth = cardElement.dataset.width || '';
 				updatePrice();
 			});
+		});
+		
+		// Sélectionner par défaut les premières options
+		document.querySelector('.edition-card')?.classList.add('border-4', 'border-primary');
+		document.querySelector('.edition-card')?.classList.remove('border-2', 'border-transparent');
+		
+		// La sélection par défaut du matériau est gérée dans loadMaterials()
+		
+		const defaultSizeCard = document.querySelector('.size-card[data-size="M"]');
+		if (defaultSizeCard) {
+			defaultSizeCard.classList.add('border-4', 'border-primary');
+			defaultSizeCard.classList.remove('border-2', 'border-transparent');
+		}
+
+		// Dimensions inputs
+		const largeurPontInput = document.getElementById('largeur-pont-input') as HTMLInputElement;
+		const largeurVerreInput = document.getElementById('largeur-verre-input') as HTMLInputElement;
+		const hauteurVerreInput = document.getElementById('hauteur-verre-input') as HTMLInputElement;
+		const longueurBrancheInput = document.getElementById('longueur-branche-input') as HTMLInputElement;
+
+		largeurPontInput?.addEventListener('input', (e) => {
+			const target = e.target as HTMLInputElement;
+			config.largeurPont = parseInt(target.value) || null;
+		});
+
+		largeurVerreInput?.addEventListener('input', (e) => {
+			const target = e.target as HTMLInputElement;
+			config.largeurVerre = parseInt(target.value) || null;
+		});
+
+		hauteurVerreInput?.addEventListener('input', (e) => {
+			const target = e.target as HTMLInputElement;
+			config.hauteurVerre = parseInt(target.value) || null;
+		});
+
+		longueurBrancheInput?.addEventListener('input', (e) => {
+			const target = e.target as HTMLInputElement;
+			config.longueurBranche = parseInt(target.value) || null;
 		});
 
 		// Color selection
@@ -595,17 +745,63 @@ import Layout from '../layouts/Layout.astro';
 
 		// Signature input
 		document.getElementById('signature-input')?.addEventListener('input', (e) => {
-			config.signature = e.target.value;
+			const target = e.target as HTMLInputElement;
+			config.signature = target.value;
 		});
 
 		// Save configuration
-		document.getElementById('save-config-btn')?.addEventListener('click', () => {
+		import { saveLunette } from '../JS/pocketbase.js';
+		
+		document.getElementById('save-config-btn')?.addEventListener('click', async () => {
 			if (!config.signature) {
 				alert('Veuillez entrer une signature pour votre création');
 				return;
 			}
-			console.log('Configuration saved:', config);
-			alert('Configuration sauvegardée avec succès !');
+			
+			try {
+				const btn = document.getElementById('save-config-btn') as HTMLButtonElement;
+				if (btn) {
+					btn.disabled = true;
+					btn.innerHTML = '<span class="loading loading-spinner"></span> Sauvegarde...';
+				}
+				
+				// Préparer les données pour la sauvegarde
+				const totalPrice = config.editionPrice + config.materialPrice;
+				
+				const lunetteData = {
+					signature: config.signature,
+					size: config.size,
+					largeurPont: config.largeurPont,
+					largeurVerre: config.largeurVerre,
+					hauteurVerre: config.hauteurVerre,
+					longueurBranche: config.longueurBranche,
+					prix: totalPrice,
+					colors: {
+						monture: config.colors.monture,
+						branches: config.colors.branches,
+						verres: config.colors.verres
+					}
+				};
+				
+				await saveLunette(lunetteData);
+				
+				// Afficher un message de succès
+				alert('✅ Configuration sauvegardée avec succès !');
+				
+				if (btn) {
+					btn.disabled = false;
+					btn.innerHTML = '💾 Sauvegarder ma création';
+				}
+			} catch (error: any) {
+				console.error('Erreur de sauvegarde:', error);
+				alert('❌ Erreur lors de la sauvegarde. Veuillez réessayer.');
+				
+				const btn = document.getElementById('save-config-btn') as HTMLButtonElement;
+				if (btn) {
+					btn.disabled = false;
+					btn.innerHTML = '💾 Sauvegarder ma création';
+				}
+			}
 		});
 
 		// Restart configuration
