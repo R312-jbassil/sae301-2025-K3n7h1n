@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css"
+import { defaultLang } from "../i18n/ui.js";
 
 interface Props {
 	title?: string;
@@ -10,10 +11,13 @@ const {
 	title = 'TaVue - Lunettes personnalisées',
 	description = 'Créez vos lunettes parfaites en quelques clics. Personnalisez votre monture, vos couleurs et affirmez votre style unique.'
 } = Astro.props;
+
+// Get current language from locals or cookie
+const locale = Astro.locals.lang || Astro.cookies.get('lang')?.value || defaultLang;
 ---
 
 <!doctype html>
-<html lang="fr">
+<html lang={locale}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />

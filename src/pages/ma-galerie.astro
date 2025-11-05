@@ -9,15 +9,31 @@ import Layout from '../layouts/Layout.astro';
 			<div class="text-center mb-12">
 				<h1 class="text-4xl font-bold mb-4">Ma galerie</h1>
 				<p class="text-lg text-base-content/70">
-					Retrouvez toutes vos créations de lunettes personnalisées. Vous pouvez les consulter,<br />
-					les partager ou les commander.
+					Retrouvez toutes vos créations de lunettes personnalisées et vos SVG générés par IA
 				</p>
+			</div>
+
+			<!-- Tabs Navigation -->
+			<div role="tablist" class="tabs tabs-boxed mb-8 bg-base-100 shadow-lg">
+				<a role="tab" class="tab tab-active" id="tab-lunettes">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+					</svg>
+					Mes Lunettes
+				</a>
+				<a role="tab" class="tab" id="tab-svg">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+					</svg>
+					Créations IA
+				</a>
 			</div>
 			
 			<!-- Sidebar + Grid Layout -->
-			<div class="flex flex-col lg:flex-row gap-8">
+			<div class="flex flex-col lg:flex-row gap-8" id="content-lunettes">
 				<!-- Sidebar - Mes créations count -->
-				<div class="lg:w-64 flex-shrink-0">
+				<div class="lg:w-64 shrink-0">
 					<div class="card bg-base-100 shadow-xl sticky top-24">
 						<div class="card-body">
 							<h2 class="card-title text-lg">Mes créations</h2>
@@ -34,7 +50,7 @@ import Layout from '../layouts/Layout.astro';
 				</div>
 				
 				<!-- Grid des créations -->
-				<div class="flex-grow">
+				<div class="grow">
 					<!-- Loading state -->
 					<div id="loading-state" class="flex justify-center items-center py-20">
 						<span class="loading loading-spinner loading-lg text-primary"></span>
@@ -56,8 +72,60 @@ import Layout from '../layouts/Layout.astro';
 					</div>
 					
 					<!-- Grid des lunettes -->
-					<div id="lunettes-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 hidden">
+					<div id="lunettes-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 						<!-- Les cartes seront ajoutées dynamiquement ici -->
+					</div>
+				</div>
+			</div>
+
+			<!-- Content for SVG IA Section -->
+			<div class="hidden" id="content-svg">
+				<div class="flex flex-col lg:flex-row gap-8">
+					<!-- Sidebar - SVG count -->
+					<div class="lg:w-64 shrink-0">
+						<div class="card bg-base-100 shadow-xl sticky top-24">
+							<div class="card-body">
+								<h2 class="card-title text-lg">Mes SVG IA</h2>
+								<div class="text-4xl font-bold text-secondary" id="svg-count">0</div>
+								<div class="divider"></div>
+								<a href="/generateurIA" class="btn btn-secondary btn-block">
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+									</svg>
+									Nouveau SVG
+								</a>
+								<a href="/gallery" class="btn btn-ghost btn-block btn-sm">
+									Voir tous les SVG
+								</a>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Grid SVG -->
+					<div class="grow">
+						<!-- Loading state SVG -->
+						<div id="loading-state-svg" class="flex justify-center items-center py-20">
+							<span class="loading loading-spinner loading-lg text-secondary"></span>
+						</div>
+						
+						<!-- Empty state SVG -->
+						<div id="empty-state-svg" class="hidden">
+							<div class="card bg-base-100 shadow-xl">
+								<div class="card-body text-center py-20">
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto text-base-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+									</svg>
+									<h2 class="text-2xl font-bold mb-2">Aucun SVG généré</h2>
+									<p class="text-base-content/70 mb-6">Commencez à créer des SVG avec l'IA !</p>
+									<a href="/generateurIA" class="btn btn-secondary">Générer un SVG</a>
+								</div>
+							</div>
+						</div>
+						
+						<!-- Grid des SVG -->
+						<div id="svg-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+							<!-- Les cartes SVG seront ajoutées dynamiquement ici -->
+						</div>
 					</div>
 				</div>
 			</div>
@@ -81,15 +149,53 @@ import Layout from '../layouts/Layout.astro';
 
 	<script>
 		import { getUserLunettes, deleteLunette, isAuthenticated, addToCart } from '../JS/pocketbase.js';
+		import PocketBase from 'pocketbase';
+
+		const pb = new PocketBase('http://127.0.0.1:8090');
 
 		let lunettes: any[] = [];
+		let svgList: any[] = [];
 		let lunetteToDelete: string | null = null;
+		let currentTab: 'lunettes' | 'svg' = 'lunettes';
 
 		// Vérifier l'authentification
 		if (!isAuthenticated()) {
 			alert('Vous devez être connecté pour voir vos créations');
 			window.location.href = '/connexion';
 		}
+
+		// Load auth
+		const authCookie = document.cookie
+			.split('; ')
+			.find(row => row.startsWith('pb_auth='));
+		if (authCookie) {
+			pb.authStore.loadFromCookie(authCookie);
+		}
+
+		// Gestion des onglets
+		const tabLunettes = document.getElementById('tab-lunettes');
+		const tabSvg = document.getElementById('tab-svg');
+		const contentLunettes = document.getElementById('content-lunettes');
+		const contentSvg = document.getElementById('content-svg');
+
+		tabLunettes?.addEventListener('click', () => {
+			currentTab = 'lunettes';
+			tabLunettes.classList.add('tab-active');
+			tabSvg?.classList.remove('tab-active');
+			contentLunettes?.classList.remove('hidden');
+			contentSvg?.classList.add('hidden');
+		});
+
+		tabSvg?.addEventListener('click', () => {
+			currentTab = 'svg';
+			tabSvg.classList.add('tab-active');
+			tabLunettes?.classList.remove('tab-active');
+			contentSvg?.classList.remove('hidden');
+			contentLunettes?.classList.add('hidden');
+			if (svgList.length === 0) {
+				loadSVGCreations();
+			}
+		});
 
 		// Charger les créations
 		async function loadCreations() {
@@ -264,6 +370,143 @@ import Layout from '../layouts/Layout.astro';
 				grid.appendChild(card);
 			});
 		}
+
+		// Charger les SVG créés par l'IA
+		async function loadSVGCreations() {
+			const loadingState = document.getElementById('loading-state-svg');
+			const emptyState = document.getElementById('empty-state-svg');
+			const grid = document.getElementById('svg-grid');
+			const countEl = document.getElementById('svg-count');
+
+			try {
+				const userId = pb.authStore.model?.id;
+				if (!userId) {
+					throw new Error('User not authenticated');
+				}
+
+				// Charger tous les SVG (pour l'instant sans filtre utilisateur)
+				// TODO: Ajouter un champ 'user' dans la collection lunette_ia pour filtrer par utilisateur
+				svgList = await pb.collection('lunette_ia').getFullList({
+					sort: '-created',
+				});
+				
+				console.log('🎨 SVG chargés:', svgList);
+
+				if (loadingState) loadingState.classList.add('hidden');
+
+				if (svgList.length === 0) {
+					if (emptyState) emptyState.classList.remove('hidden');
+					if (grid) grid.classList.add('hidden');
+					if (countEl) countEl.textContent = '0';
+				} else {
+					if (emptyState) emptyState.classList.add('hidden');
+					if (grid) {
+						grid.classList.remove('hidden');
+						displaySVG();
+					}
+					if (countEl) countEl.textContent = svgList.length.toString();
+				}
+			} catch (error) {
+				console.error('❌ Erreur de chargement SVG:', error);
+				if (loadingState) loadingState.classList.add('hidden');
+				if (emptyState) emptyState.classList.remove('hidden');
+			}
+		}
+
+		// Afficher les SVG
+		function displaySVG() {
+			const grid = document.getElementById('svg-grid');
+			if (!grid) return;
+
+			grid.innerHTML = '';
+
+			svgList.forEach((svg) => {
+				const card = document.createElement('div');
+				card.className = 'card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow';
+				
+				const createdDate = new Date(svg.created);
+				const dateStr = `Créé le ${createdDate.toLocaleDateString('fr-FR')}`;
+
+				card.innerHTML = `
+					<figure class="px-10 pt-10 bg-white min-h-[250px] flex items-center justify-center">
+						<div class="w-full h-full flex items-center justify-center">
+							${svg.code_svg || '<p class="text-gray-400">Aperçu non disponible</p>'}
+						</div>
+					</figure>
+					<div class="card-body">
+						<h2 class="card-title">${svg.modele_ia || 'Sans nom'}</h2>
+						<p class="text-sm text-base-content/70">${dateStr}</p>
+						
+						<div class="card-actions justify-between items-center mt-4">
+							<div class="flex gap-2">
+								<a 
+									href="/gallery/${svg.id}"
+									class="btn btn-sm btn-ghost btn-circle"
+									title="Modifier"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+									</svg>
+								</a>
+								<button 
+									class="btn btn-sm btn-ghost btn-circle"
+									onclick="copySVGCode('${svg.id}')"
+									title="Copier le code"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+									</svg>
+								</button>
+								<button 
+									class="btn btn-sm btn-ghost btn-circle text-error"
+									onclick="confirmDeleteSVG('${svg.id}')"
+									title="Supprimer"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+									</svg>
+								</button>
+							</div>
+							<a 
+								href="/gallery/${svg.id}"
+								class="btn btn-secondary btn-sm"
+							>
+								Modifier
+							</a>
+						</div>
+					</div>
+				`;
+
+				grid.appendChild(card);
+			});
+		}
+
+		// Copier le code SVG
+		(window as any).copySVGCode = function(svgId: string) {
+			const svg = svgList.find(s => s.id === svgId);
+			if (svg && svg.code_svg) {
+				navigator.clipboard.writeText(svg.code_svg).then(() => {
+					alert('✅ Code SVG copié dans le presse-papier !');
+				}).catch(err => {
+					console.error('Erreur de copie:', err);
+					alert('❌ Erreur lors de la copie');
+				});
+			}
+		};
+
+		// Confirmer suppression SVG
+		(window as any).confirmDeleteSVG = async function(svgId: string) {
+			if (confirm('Êtes-vous sûr de vouloir supprimer ce SVG ?')) {
+				try {
+					await pb.collection('lunette_ia').delete(svgId);
+					alert('✅ SVG supprimé avec succès');
+					await loadSVGCreations();
+				} catch (error) {
+					console.error('❌ Erreur de suppression:', error);
+					alert('❌ Erreur lors de la suppression');
+				}
+			}
+		};
 
 		// Confirmer la suppression
 		(window as any).confirmDelete = function(lunetteId: string) {

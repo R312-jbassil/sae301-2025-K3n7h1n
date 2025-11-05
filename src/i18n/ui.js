@@ -16,6 +16,21 @@ export const ui = {
     'nav.login': 'Login',
     'nav.register': 'Register',
     'nav.logout': 'Logout',
+    'nav.presentation': 'Presentation',
+    'nav.configure': 'Configure',
+    'nav.new': 'New',
+    'nav.myGlasses': 'Configure my glasses',
+    
+    // Footer
+    'footer.slogan': 'Create your glasses, express yourself with style and originality',
+    'footer.navigation': 'Navigation',
+    'footer.about': 'About',
+    'footer.ourStory': 'Our story',
+    'footer.legal': 'Legal notice',
+    'footer.terms': 'Terms of sale',
+    'footer.followUs': 'Follow us',
+    'footer.rights': 'All rights reserved',
+    'footer.privacy': 'Privacy Policy',
     
     // Generator page
     'generator.title': 'AI SVG Generator',
@@ -68,6 +83,21 @@ export const ui = {
     'nav.login': 'Connexion',
     'nav.register': 'Inscription',
     'nav.logout': 'Déconnexion',
+    'nav.presentation': 'Présentation',
+    'nav.configure': 'Configurer',
+    'nav.new': 'Nouveau',
+    'nav.myGlasses': 'Configurer mes lunettes',
+    
+    // Footer
+    'footer.slogan': 'Créez vos lunettes, affirmez-vous avec style et originalité',
+    'footer.navigation': 'Navigation',
+    'footer.about': 'À propos',
+    'footer.ourStory': 'Notre histoire',
+    'footer.legal': 'Mentions légales',
+    'footer.terms': 'CGV',
+    'footer.followUs': 'Nous suivre',
+    'footer.rights': 'Tous droits réservés',
+    'footer.privacy': 'Politique de Confidentialité',
     
     // Generator page
     'generator.title': 'Générateur de SVG par IA',

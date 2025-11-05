@@ -11,8 +11,27 @@ console.log('Translation test:', t('generator.title'));
 
 <Layout title={t('generator.title')}>
 	<div class="container mx-auto px-4 py-8 min-h-screen">
-		<!-- Title -->
-		<h1 class="text-4xl font-bold text-center mb-8">{t('generator.title')}</h1>
+		<!-- Title and Language Selector -->
+		<div class="flex justify-between items-center mb-8">
+			<h1 class="text-4xl font-bold">{t('generator.title')}</h1>
+			
+			<!-- Language Selector -->
+			<div class="dropdown dropdown-end">
+				<button tabindex="0" class="btn btn-outline btn-sm gap-2">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+					</svg>
+					<span id="current-lang">{locale.toUpperCase()}</span>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+					</svg>
+				</button>
+				<ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-10 p-2 shadow bg-base-100 rounded-box w-40">
+					<li><button data-lang="fr" class="lang-option">🇫🇷 Français</button></li>
+					<li><button data-lang="en" class="lang-option">🇬🇧 English</button></li>
+				</ul>
+			</div>
+		</div>
 
 		<!-- Main Grid Layout -->
 		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -102,26 +121,68 @@ console.log('Translation test:', t('generator.title'));
 	const saveButton = document.getElementById("save-button");
 
 	async function saveSVG(params) {
-		const res = await fetch("/api/saveSVG", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(params),
-		});
-		const data = await res.json();
-		return data;
+		try {
+			console.log("Sending to API:", params);
+			const res = await fetch("/api/saveSVG", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(params),
+			});
+			
+			const data = await res.json();
+			console.log("API Response:", data);
+			
+			if (!res.ok) {
+				throw new Error(data.error || data.details || "Failed to save");
+			}
+			
+			return data;
+		} catch (error) {
+			console.error("Save error:", error);
+			throw error;
+		}
 	}
+	
 	if (saveButton) {
 		saveButton.addEventListener("click", async () => {
-			const name = prompt("Enter a name for the SVG:");
-			const svgOutput = document.getElementById("svg-output")?.textContent;
-			console.log("Saving SVG: ", JSON.stringify(svgOutput));
-			
-			const params = {
-				modele_ia: name,
-				code_svg: svgOutput || "<svg></svg>",
-				chat_history: promptList,
-			};
-			await saveSVG(params);
+			try {
+				const name = prompt("Entrez un nom pour le SVG:");
+				if (!name) {
+					alert("Nom requis pour sauvegarder");
+					return;
+				}
+				
+				const svgOutput = document.getElementById("svg-output")?.textContent;
+				
+				if (!svgOutput || svgOutput.trim() === "" || svgOutput === "// Le code SVG apparaîtra ici") {
+					alert("Aucun SVG à sauvegarder. Générez d'abord un SVG.");
+					return;
+				}
+				
+				console.log("Saving SVG with name:", name);
+				console.log("SVG content length:", svgOutput.length);
+				
+				const params = {
+					modele_ia: name,
+					code_svg: svgOutput,
+					chat_history: promptList,
+				};
+				
+				saveButton.disabled = true;
+				saveButton.textContent = "Sauvegarde...";
+				
+				const result = await saveSVG(params);
+				
+				alert("SVG sauvegardé avec succès ! ID: " + result.id);
+				console.log("Saved successfully:", result);
+				
+			} catch (error) {
+				console.error("Error in save button:", error);
+				alert("Erreur lors de la sauvegarde: " + error.message);
+			} finally {
+				saveButton.disabled = false;
+				saveButton.textContent = "Sauvegarder";
+			}
 		});
 	}
 			
@@ -198,4 +259,27 @@ console.log('Translation test:', t('generator.title'));
 	if (editButton) {
 		editButton.addEventListener("click", handleEdit);
 	}
+
+	// Language Switcher
+	function setLanguage(lang) {
+		// Set cookie for 1 year
+		const date = new Date();
+		date.setFullYear(date.getFullYear() + 1);
+		document.cookie = `lang=${lang}; expires=${date.toUTCString()}; path=/`;
+		
+		// Reload page to apply new language
+		window.location.reload();
+	}
+
+	// Handle language selection
+	document.querySelectorAll('.lang-option').forEach(option => {
+		option.addEventListener('click', (e) => {
+			e.preventDefault();
+			const lang = e.target.getAttribute('data-lang');
+			if (lang) {
+				setLanguage(lang);
+			}
+		});
+	});
 </script>
+

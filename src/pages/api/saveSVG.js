@@ -7,10 +7,20 @@ export async function POST({ request, cookies }) {
     // Get auth from cookies
     const authCookie = cookies.get("pb_auth");
     if (authCookie) {
-      pb.authStore.loadFromCookie(authCookie.value);
+      try {
+        pb.authStore.loadFromCookie(authCookie.value);
+        console.log("Auth loaded:", pb.authStore.isValid);
+      } catch (authError) {
+        console.error("Auth error:", authError);
+      }
+    } else {
+      console.log("No auth cookie found");
     }
 
-    const { modele_ia, code_svg, chat_history } = await request.json();
+    const body = await request.json();
+    console.log("Received data:", body);
+    
+    const { modele_ia, code_svg, chat_history } = body;
 
     if (!modele_ia || !code_svg) {
       return new Response(
@@ -26,11 +36,15 @@ export async function POST({ request, cookies }) {
       );
     }
 
+    console.log("Creating record in lunette_ia collection...");
+    
     const record = await pb.collection("lunette_ia").create({
-      modele_ia,
-      code_svg,
+      modele_ia: modele_ia,
+      code_svg: code_svg,
       chat_history: chat_history || [],
     });
+
+    console.log("Record created successfully:", record.id);
 
     return new Response(
       JSON.stringify({
@@ -46,9 +60,12 @@ export async function POST({ request, cookies }) {
     );
   } catch (error) {
     console.error("Error saving SVG:", error);
+    console.error("Error details:", error.response?.data || error.message);
+    
     return new Response(
       JSON.stringify({
         error: error.message || "Failed to save SVG",
+        details: error.response?.data || error.toString(),
       }),
       {
         status: 500,
