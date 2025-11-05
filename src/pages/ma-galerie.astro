@@ -137,40 +137,44 @@ import Layout from '../layouts/Layout.astro';
 				const dateStr = `Créée le ${createdDate.toLocaleDateString('fr-FR')}`;
 				
 				// Couleurs par défaut si non définies
-				const couleurMonture = lunette.couleur_monture_hex || '#000000';
-				const couleurBranches = lunette.couleur_branche_hex || '#000000';
-				const couleurVerres = lunette.couleur_verre_hex || '#87CEEB';
+				const couleurMonture = lunette.couleur_monture_hex || '#1d1d1b';
+				const couleurBranches = lunette.couleur_branche_hex || '#8B4513';
+				const couleurVerres = lunette.couleur_verre_hex || 'rgba(135, 206, 235, 0.5)';
 
 				card.innerHTML = `
 					<figure class="px-10 pt-10 pb-6">
-						<div class="w-full h-48 bg-base-200 rounded-lg flex items-center justify-center p-4">
+						<div class="w-full h-48 bg-white rounded-lg flex items-center justify-center p-4">
 							<svg 
 								xmlns="http://www.w3.org/2000/svg" 
 								xmlns:xlink="http://www.w3.org/1999/xlink" 
 								version="1.1" 
-								viewBox="0 0 595.28 841.89"
-								style="filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1)); width: 100%; height: auto; max-height: 160px;"
+								viewBox="50 120 495 140"
+								style="filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2)); width: 100%; height: auto;"
 							>
 								<defs>
 									<style>
 										.cls-1-${lunette.id} {
 											fill: ${couleurBranches};
-											mix-blend-mode: multiply;
 										}
 										.cls-2-${lunette.id} {
 											isolation: isolate;
 										}
-										.cls-3-${lunette.id}, .cls-4-${lunette.id} {
-											fill: #ffffff;
+										.cls-3-${lunette.id} {
+											fill: ${couleurMonture};
 										}
 										.cls-4-${lunette.id} {
+											fill: ${couleurBranches};
 											stroke: ${couleurMonture};
 											stroke-miterlimit: 10;
-											stroke-width: .5px;
+											stroke-width: 1px;
 										}
 										.cls-5-${lunette.id} {
 											fill: ${couleurVerres};
 											opacity: .75;
+										}
+										/* Spécifique pour la monture */
+										#monture .cls-4-${lunette.id} {
+											fill: ${couleurMonture};
 										}
 									</style>
 								</defs>
@@ -218,14 +222,23 @@ import Layout from '../layouts/Layout.astro';
 						
 						<div class="card-actions justify-between items-center mt-4">
 							<div class="flex gap-2">
-								<button 
+								<a 
+									href="/lunette/${lunette.id}"
 									class="btn btn-sm btn-ghost btn-circle"
-									onclick="viewDetails('${lunette.id}')"
 									title="En savoir plus"
 								>
 									<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+									</svg>
+								</a>
+								<button 
+									class="btn btn-sm btn-ghost btn-circle"
+									onclick="addToCartFromGallery('${lunette.id}')"
+									title="Ajouter au panier"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
 									</svg>
 								</button>
 								<button 
@@ -238,12 +251,12 @@ import Layout from '../layouts/Layout.astro';
 									</svg>
 								</button>
 							</div>
-							<button 
+							<a 
+								href="/lunette/${lunette.id}"
 								class="btn btn-primary btn-sm"
-								onclick="addToCartFromGallery('${lunette.id}')"
 							>
-								En savoir plus
-							</button>
+								Voir les détails
+							</a>
 						</div>
 					</div>
 				`;
@@ -251,26 +264,6 @@ import Layout from '../layouts/Layout.astro';
 				grid.appendChild(card);
 			});
 		}
-
-		// Voir les détails d'une lunette
-		(window as any).viewDetails = function(lunetteId: string) {
-			const lunette = lunettes.find(l => l.id === lunetteId);
-			if (!lunette) return;
-
-			alert(`
-Détails de la création:
-
-Nom: ${lunette.nom_modele || 'Sans nom'}
-Taille: ${lunette.taille_monture || 'Non spécifiée'}
-Prix: ${lunette.prix ? lunette.prix.toFixed(2) + ' €' : 'Non spécifié'}
-
-Dimensions:
-- Largeur pont: ${lunette.largeur_pont_mm || 'N/A'} mm
-- Largeur verre: ${lunette.largeur_verre_mm || 'N/A'} mm
-- Hauteur verre: ${lunette.hauteur_verre_mm || 'N/A'} mm
-- Longueur branche: ${lunette.longueur_branche_mm || 'N/A'} mm
-			`);
-		};
 
 		// Confirmer la suppression
 		(window as any).confirmDelete = function(lunetteId: string) {

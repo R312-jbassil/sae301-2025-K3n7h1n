@@ -9,8 +9,8 @@ import Layout from '../layouts/Layout.astro';
 			
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 				<!-- Liste des articles -->
-				<div class="lg:col-span-2 space-y-4">
-					<div id="cart-items-container">
+				<div class="lg:col-span-2">
+					<div id="cart-items-container" class="space-y-6">
 						<!-- Les articles seront chargés dynamiquement -->
 						<div class="flex justify-center items-center py-20">
 							<span class="loading loading-spinner loading-lg text-primary"></span>
@@ -181,9 +181,9 @@ import Layout from '../layouts/Layout.astro';
 					const materiauText = (details as any).materiaux?.monture?.libelle || 'Bois noyer';
 					const nomModele = (details as any).nom_modele || 'test';
 					const prix = (details as any).prix || 449.00;
-					const couleurMonture = (details as any).couleur_monture_hex || '#000000';
-					const couleurBranches = (details as any).couleur_branche_hex || '#ff00ff';
-					const couleurVerres = (details as any).couleur_verre_hex || '#ff6600';
+					const couleurMonture = (details as any).couleur_monture_hex || '#1d1d1b';
+					const couleurBranches = (details as any).couleur_branche_hex || '#8B4513';
+					const couleurVerres = (details as any).couleur_verre_hex || 'rgba(135, 206, 235, 0.5)';
 					
 					const card = document.createElement('div');
 					card.className = 'card bg-base-100 shadow-xl';
@@ -192,34 +192,38 @@ import Layout from '../layouts/Layout.astro';
 							<div class="flex flex-col md:flex-row gap-6">
 								<!-- Image avec SVG des lunettes -->
 								<div class="flex-shrink-0">
-									<div class="w-full md:w-32 h-32 bg-base-200 rounded-lg flex items-center justify-center p-2">
+									<div class="w-full md:w-48 h-32 bg-white rounded-lg flex items-center justify-center p-2">
 										<svg 
 											xmlns="http://www.w3.org/2000/svg" 
 											xmlns:xlink="http://www.w3.org/1999/xlink" 
 											version="1.1" 
-											viewBox="0 0 595.28 841.89"
-											style="filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1)); width: 100%; height: auto;"
+											viewBox="50 120 495 140"
+											style="filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2)); width: 100%; height: auto;"
 										>
 											<defs>
 												<style>
 													.cls-1-cart-${details.id} {
 														fill: ${couleurBranches};
-														mix-blend-mode: multiply;
 													}
 													.cls-2-cart-${details.id} {
 														isolation: isolate;
 													}
-													.cls-3-cart-${details.id}, .cls-4-cart-${details.id} {
-														fill: #ffffff;
+													.cls-3-cart-${details.id} {
+														fill: ${couleurMonture};
 													}
 													.cls-4-cart-${details.id} {
+														fill: ${couleurBranches};
 														stroke: ${couleurMonture};
 														stroke-miterlimit: 10;
-														stroke-width: .5px;
+														stroke-width: 1px;
 													}
 													.cls-5-cart-${details.id} {
 														fill: ${couleurVerres};
 														opacity: .75;
+													}
+													/* Spécifique pour la monture */
+													#monture .cls-4-cart-${details.id} {
+														fill: ${couleurMonture};
 													}
 												</style>
 											</defs>
