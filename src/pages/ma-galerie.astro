@@ -149,9 +149,7 @@ import Layout from '../layouts/Layout.astro';
 
 	<script>
 		import { getUserLunettes, deleteLunette, isAuthenticated, addToCart } from '../JS/pocketbase.js';
-		import PocketBase from 'pocketbase';
-
-		const pb = new PocketBase('http://127.0.0.1:8090');
+		import pb from '../utils/pb';
 
 		let lunettes: any[] = [];
 		let svgList: any[] = [];

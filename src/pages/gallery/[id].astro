@@ -1,9 +1,9 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import PocketBase from "pocketbase";
+import pb from "../../utils/pb";
+import type { LunetteIaResponse, ChatMessage } from "../../utils/pocketbase-types";
 
 const { id } = Astro.params;
-const pb = new PocketBase("http://127.0.0.1:8090");
 
 // Get auth from cookies
 const authCookie = Astro.cookies.get("pb_auth");
@@ -11,9 +11,19 @@ if (authCookie) {
 	pb.authStore.loadFromCookie(authCookie.value);
 }
 
-let svg = null;
+let svg: LunetteIaResponse | null = null;
+let chatHistory: ChatMessage[] = [];
 try {
 	svg = await pb.collection("lunette_ia").getOne(id || "");
+	// Parse chat_history if it exists
+	if (svg?.chat_history) {
+		try {
+			chatHistory = JSON.parse(svg.chat_history);
+		} catch (e) {
+			console.error("Error parsing chat_history:", e);
+			chatHistory = [];
+		}
+	}
 } catch (error) {
 	console.error("Error fetching SVG:", error);
 	return Astro.redirect("/gallery");
@@ -48,7 +58,7 @@ try {
 					
 					<!-- Chat History -->
 					<div id="chat-history" class="mb-4 max-h-[300px] overflow-y-auto space-y-2">
-						{svg?.chat_history && svg.chat_history.map((message: any) => (
+						{chatHistory && chatHistory.map((message) => (
 							<div class={`chat ${message.role === 'user' ? 'chat-end' : 'chat-start'}`}>
 								<div class="chat-bubble">
 									{message.content.substring(0, 200)}

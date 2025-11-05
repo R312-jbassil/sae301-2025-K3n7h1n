@@ -1,7 +1,7 @@
-import PocketBase from 'pocketbase';
+import pb from '../utils/pb.ts';
 
-// Initialiser PocketBase avec l'URL du serveur local
-export const pb = new PocketBase('http://127.0.0.1:8090');
+// Exporter pb pour compatibilité
+export { pb };
 
 // Activer l'auto-annulation pour les requêtes en attente
 pb.autoCancellation(false);
