@@ -135,7 +135,7 @@ try {
 				chatHistory.push({ role: "user", content: prompt });
 
 				// Call API with full history
-				const res = await fetch("/api/generateSVG", {
+				const res = await fetch("/api2/generateSVG", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ 
@@ -176,7 +176,7 @@ try {
 			saveButton.disabled = true;
 
 			try {
-				const res = await fetch("/api/updateSVG", {
+				const res = await fetch("/api2/updateSVG", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({

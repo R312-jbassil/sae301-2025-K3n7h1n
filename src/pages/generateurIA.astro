@@ -123,7 +123,7 @@ console.log('Translation test:', t('generator.title'));
 	async function saveSVG(params) {
 		try {
 			console.log("Sending to API:", params);
-			const res = await fetch("/api/saveSVG", {
+			const res = await fetch("/api2/saveSVG", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(params),
@@ -190,7 +190,7 @@ console.log('Translation test:', t('generator.title'));
 
 	async function generateSVG(messages) {
 		console.log("Generating SVG with messages:", messages);
-		const res = await fetch("/api/generateSVG", {
+		const res = await fetch("/api2/generateSVG", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ messages }),

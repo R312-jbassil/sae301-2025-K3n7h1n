@@ -6,6 +6,7 @@ export async function POST({ request }) {
     const apiKey = import.meta.env.PUBLIC_HF_TOKEN || process.env.PUBLIC_HF_TOKEN;
     
     if (!apiKey) {
+        
       console.error("HuggingFace API token not found in environment variables");
       return new Response(
         JSON.stringify({
