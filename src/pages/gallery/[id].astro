@@ -1,0 +1,209 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PocketBase from "pocketbase";
+
+const { id } = Astro.params;
+const pb = new PocketBase("http://127.0.0.1:8090");
+
+// Get auth from cookies
+const authCookie = Astro.cookies.get("pb_auth");
+if (authCookie) {
+	pb.authStore.loadFromCookie(authCookie.value);
+}
+
+let svg = null;
+try {
+	svg = await pb.collection("lunette_ia").getOne(id || "");
+} catch (error) {
+	console.error("Error fetching SVG:", error);
+	return Astro.redirect("/gallery");
+}
+---
+
+<Layout title={`Modifier ${svg?.modele_ia || 'SVG'}`}>
+	<div class="container mx-auto px-4 py-8">
+		<div class="mb-6">
+			<a href="/gallery" class="btn btn-ghost btn-sm">
+				← Retour à la galerie
+			</a>
+		</div>
+
+		<h1 class="text-4xl font-bold mb-8">{svg?.modele_ia}</h1>
+
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+			<!-- SVG Preview -->
+			<div class="card bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h2 class="card-title mb-4">Aperçu</h2>
+					<div id="svg-container" class="bg-white p-4 rounded-lg min-h-[400px] flex items-center justify-center">
+						<div set:html={svg?.code_svg} />
+					</div>
+				</div>
+			</div>
+
+			<!-- Chat Interface -->
+			<div class="card bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h2 class="card-title mb-4">Modifier avec l'IA</h2>
+					
+					<!-- Chat History -->
+					<div id="chat-history" class="mb-4 max-h-[300px] overflow-y-auto space-y-2">
+						{svg?.chat_history && svg.chat_history.map((message: any) => (
+							<div class={`chat ${message.role === 'user' ? 'chat-end' : 'chat-start'}`}>
+								<div class="chat-bubble">
+									{message.content.substring(0, 200)}
+									{message.content.length > 200 ? '...' : ''}
+								</div>
+							</div>
+						))}
+					</div>
+
+					<!-- Input -->
+					<div class="form-control">
+						<label class="label">
+							<span class="label-text">Demande de modification</span>
+						</label>
+						<textarea
+							id="edit-prompt"
+							class="textarea textarea-bordered h-24"
+							placeholder="Ex: Rends le cercle plus grand et change la couleur en rouge"
+						></textarea>
+					</div>
+
+					<div class="card-actions justify-end mt-4">
+						<button id="edit-button" class="btn btn-primary">
+							Modifier
+						</button>
+						<button id="save-button" class="btn btn-success">
+							Sauvegarder
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Code Viewer -->
+			<div class="card bg-base-100 shadow-xl lg:col-span-2">
+				<div class="card-body">
+					<h2 class="card-title mb-4">Code SVG</h2>
+					<textarea
+						id="svg-code"
+						class="textarea textarea-bordered font-mono text-sm h-64"
+						readonly
+					>{svg?.code_svg}</textarea>
+					<button
+						id="copy-button"
+						class="btn btn-ghost btn-sm self-end"
+					>
+						Copier le code
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script define:vars={{ svgId: id, initialHistory: svg?.chat_history || [], initialCode: svg?.code_svg || '' }}>
+		let chatHistory = [...initialHistory];
+		let currentCode = initialCode;
+
+		const editButton = document.getElementById("edit-button");
+		const saveButton = document.getElementById("save-button");
+		const copyButton = document.getElementById("copy-button");
+		const editPrompt = document.getElementById("edit-prompt");
+		const svgContainer = document.getElementById("svg-container");
+		const svgCodeElement = document.getElementById("svg-code");
+		const chatHistoryElement = document.getElementById("chat-history");
+
+		async function modifySVG() {
+			const prompt = editPrompt.value.trim();
+			if (!prompt) return;
+
+			editButton.disabled = true;
+			svgContainer.innerHTML = `<span class="loading loading-ring loading-xl"></span>`;
+
+			try {
+				// Add user message to history
+				chatHistory.push({ role: "user", content: prompt });
+
+				// Call API with full history
+				const res = await fetch("/api/generateSVG", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ 
+						messages: [
+							...chatHistory,
+							{ role: "system", content: `Current SVG code to modify:\n${currentCode}` }
+						]
+					}),
+				});
+
+				const data = await res.json();
+				
+				if (data.svg && data.svg.content) {
+					currentCode = data.svg.content;
+					chatHistory.push({ role: "assistant", content: currentCode });
+
+					// Update display
+					svgContainer.innerHTML = currentCode;
+					svgCodeElement.textContent = currentCode;
+
+					// Add chat bubble
+					const chatDiv = document.createElement("div");
+					chatDiv.className = "chat chat-end";
+					chatDiv.innerHTML = `<div class="chat-bubble">${prompt}</div>`;
+					chatHistoryElement.appendChild(chatDiv);
+
+					editPrompt.value = "";
+				}
+			} catch (error) {
+				console.error("Error modifying SVG:", error);
+				alert("Erreur lors de la modification du SVG");
+			} finally {
+				editButton.disabled = false;
+			}
+		}
+
+		async function saveSVG() {
+			saveButton.disabled = true;
+
+			try {
+				const res = await fetch("/api/updateSVG", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						id: svgId,
+						code_svg: currentCode,
+						chat_history: chatHistory,
+					}),
+				});
+
+				const data = await res.json();
+				
+				if (data.success) {
+					alert("SVG sauvegardé avec succès !");
+				}
+			} catch (error) {
+				console.error("Error saving SVG:", error);
+				alert("Erreur lors de la sauvegarde");
+			} finally {
+				saveButton.disabled = false;
+			}
+		}
+
+		function copyCode() {
+			navigator.clipboard.writeText(currentCode);
+			copyButton.textContent = "Copié !";
+			setTimeout(() => {
+				copyButton.textContent = "Copier le code";
+			}, 2000);
+		}
+
+		editButton.addEventListener("click", modifySVG);
+		saveButton.addEventListener("click", saveSVG);
+		copyButton.addEventListener("click", copyCode);
+		editPrompt.addEventListener("keydown", (e) => {
+			if (e.key === "Enter" && e.ctrlKey) {
+				modifySVG();
+			}
+		});
+	</script>
+</Layout>

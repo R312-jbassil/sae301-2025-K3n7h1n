@@ -1,0 +1,71 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PocketBase from "pocketbase";
+
+const pb = new PocketBase("http://127.0.0.1:8090");
+
+// Get auth from cookies
+const authCookie = Astro.cookies.get("pb_auth");
+if (authCookie) {
+	pb.authStore.loadFromCookie(authCookie.value);
+}
+
+let svgList = [];
+try {
+	svgList = await pb.collection("lunette_ia").getFullList({
+		sort: "-created",
+	});
+} catch (error) {
+	console.error("Error fetching SVGs:", error);
+}
+
+const locale = "fr"; // You can get this from cookies or user settings
+---
+
+<Layout title="Galerie SVG">
+	<div class="container mx-auto px-4 py-8">
+		<h1 class="text-4xl font-bold mb-8">Galerie de SVG générés par IA</h1>
+
+		{
+			svgList.length === 0 ? (
+				<div class="text-center py-12">
+					<p class="text-xl mb-4">Aucun SVG généré pour le moment</p>
+					<a href="/generateurIA" class="btn btn-primary">
+						Créer votre premier SVG
+					</a>
+				</div>
+			) : (
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+					{svgList.map((svg) => (
+						<div class="card bg-base-100 shadow-xl">
+							<figure class="px-10 pt-10 bg-white">
+								<div set:html={svg.code_svg} />
+							</figure>
+							<div class="card-body">
+								<h2 class="card-title">{svg.modele_ia}</h2>
+								<p class="text-sm text-base-content/70">
+									Créé le{" "}
+									{new Date(svg.created).toLocaleDateString("fr-FR")}
+								</p>
+								<div class="card-actions justify-end mt-4">
+									<a
+										href={`/gallery/${svg.id}`}
+										class="btn btn-primary btn-sm"
+									>
+										Modifier
+									</a>
+									<button
+										class="btn btn-ghost btn-sm"
+										onclick={`navigator.clipboard.writeText(\`${svg.code_svg.replace(/`/g, "\\`")}\`)`}
+									>
+										Copier le code
+									</button>
+								</div>
+							</div>
+						</div>
+					))}
+				</div>
+			)
+		}
+	</div>
+</Layout>

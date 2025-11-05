@@ -1,0 +1,201 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { ui, defaultLang, useTranslations } from "../i18n/ui.js";
+
+const locale = (Astro.locals.lang || defaultLang);
+const t = useTranslations(locale);
+console.log('Locale in generator:', locale);
+console.log('Translation test:', t('generator.title'));
+
+---
+
+<Layout title={t('generator.title')}>
+	<div class="container mx-auto px-4 py-8 min-h-screen">
+		<!-- Title -->
+		<h1 class="text-4xl font-bold text-center mb-8">{t('generator.title')}</h1>
+
+		<!-- Main Grid Layout -->
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+			<!-- SVG Preview Panel -->
+			<div class="card bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h2 class="card-title mb-4">
+						{t('generator.preview')}
+						<button
+							class="btn btn-sm btn-primary ml-auto"
+							id="save-button"
+							title="save">{t('generator.save')}</button
+						>
+					</h2>
+					<div
+						id="svg-container"
+						class="bg-white rounded-lg p-8 min-h-[400px] flex items-center justify-center border-2 border-base-300"
+					>
+						<span class="text-gray-400 text-center"
+							>{t('generator.contentPlaceholder')}</span
+						>
+					</div>
+				</div>
+			</div>
+
+			<!-- Code Viewer Panel -->
+			<div class="card bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h2 class="card-title mb-4">
+						{t('generator.code')}
+						<button
+							class="btn btn-sm btn-secondary ml-auto"
+							id="view-button"
+							title="view">{t('generator.viewButton')}</button
+						>
+					</h2>
+					<div class="mockup-code min-h-[400px] overflow-auto">
+						<pre class="px-5 py-4"><code id="svg-output" contenteditable="true" class="outline-none text-sm">{t('generator.codePlaceholder')}</code></pre>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Prompt Input Panel -->
+		<div class="card bg-base-100 shadow-xl">
+			<div class="card-body">
+				<h2 class="card-title mb-4">{t('generator.prompt')}</h2>
+				<div class="flex flex-col lg:flex-row gap-4">
+					<textarea
+						class="textarea textarea-bordered flex-1 min-h-[100px]"
+						placeholder={t('generator.promptPlaceholder')}
+						id="user-prompt"></textarea>
+					<div class="flex flex-col gap-2 lg:w-40">
+						<button class="btn btn-primary" id="generate-button">
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+							</svg>
+							{t('generator.generateButton')}
+						</button>
+						<button class="btn btn-secondary" id="edit-button">
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+							</svg>
+							{t('generator.editButton')}
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</Layout>
+
+<script>
+	//@ts-nocheck
+	const generateButton = document.getElementById("generate-button");
+	const viewButton = document.getElementById("view-button");
+	const editButton = document.getElementById("edit-button");
+	let promptList = [];
+
+	if (viewButton) {
+		viewButton.addEventListener("click", () => {
+			const svgContainer = document.getElementById("svg-container");
+			const svgOutput = document.getElementById("svg-output");
+			svgContainer.innerHTML = svgOutput.textContent;
+		});
+	}
+	const saveButton = document.getElementById("save-button");
+
+	async function saveSVG(params) {
+		const res = await fetch("/api/saveSVG", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(params),
+		});
+		const data = await res.json();
+		return data;
+	}
+	if (saveButton) {
+		saveButton.addEventListener("click", async () => {
+			const name = prompt("Enter a name for the SVG:");
+			const svgOutput = document.getElementById("svg-output")?.textContent;
+			console.log("Saving SVG: ", JSON.stringify(svgOutput));
+			
+			const params = {
+				modele_ia: name,
+				code_svg: svgOutput || "<svg></svg>",
+				chat_history: promptList,
+			};
+			await saveSVG(params);
+		});
+	}
+			
+	
+
+	async function generateSVG(messages) {
+		console.log("Generating SVG with messages:", messages);
+		const res = await fetch("/api/generateSVG", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ messages }),
+		});
+		const data = await res.json();
+		return data.svg;
+	}
+
+
+
+	async function handleSubmit() {
+		let prompt = "";
+		let aiResponse = "";
+		const promptElement = document.getElementById("user-prompt");
+		prompt = promptElement ? promptElement.value : "";
+		console.log("submitted: ", prompt);
+		promptList.length = 0; // Clear previous prompts
+		promptList.push({ role: "user", content: prompt });
+		const svgContainer = document.getElementById("svg-container");
+		// Show loading spinner
+		svgContainer.innerHTML = `<span class="loading loading-ring loading-xl"></span>`;
+		generateButton.disabled = true;
+		editButton.disabled = true;
+		let svgOutput = document.getElementById("svg-output");
+		aiResponse = await generateSVG(promptList);
+		const svgMatch = aiResponse.content.match(/<svg[\s\S]*?<\/svg>/i);
+		aiResponse.content = svgMatch ? svgMatch[0] : "";
+		console.log("svgCode: ", aiResponse.content);
+		promptList.push(aiResponse);
+		svgOutput.textContent = aiResponse.content;
+		svgContainer.innerHTML = aiResponse.content;
+		generateButton.disabled = false;
+		editButton.disabled = false;
+	}
+
+	async function handleEdit() {
+		let prompt = "";
+		let aiResponse = "";
+		const promptElement = document.getElementById("user-prompt");
+		prompt = promptElement ? promptElement.value : "";
+		console.log("submitted: ", prompt);
+		promptList.push({ role: "user", content: prompt });
+		const svgContainer = document.getElementById("svg-container");
+		// Show loading spinner
+		svgContainer.innerHTML += `<span class="loading loading-ring loading-xl"></span>`;
+		generateButton.disabled = true;
+		editButton.disabled = true;
+		let svgOutput = document.getElementById("svg-output");
+		aiResponse = await generateSVG(promptList);
+		const svgMatch = aiResponse.content.match(/<svg[\s\S]*?<\/svg>/i);
+		aiResponse.content = svgMatch ? svgMatch[0] : "";
+		console.log("svgCode: ", aiResponse.content);
+		console.log("svgCode: ", aiResponse);
+		promptList.push(aiResponse);
+		svgOutput.textContent = aiResponse.content;
+		svgContainer.innerHTML = aiResponse.content;
+		generateButton.disabled = false;
+		editButton.disabled = false;
+		console.log("userPrompts: ", promptList);
+	}
+
+	if (generateButton) {
+		generateButton.addEventListener("click", handleSubmit);
+	}
+
+	if (editButton) {
+		editButton.addEventListener("click", handleEdit);
+	}
+</script>
