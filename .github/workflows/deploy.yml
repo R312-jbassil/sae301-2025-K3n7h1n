@@ -22,6 +22,8 @@ jobs:
       run: npm ci
       
     - name: Build project
+      env:
+        PUBLIC_HF_TOKEN: ${{ secrets.PUBLIC_HF_TOKEN }}
       run: |
         npm run build
         cp package.json dist/server/
@@ -50,4 +52,5 @@ jobs:
           npm ci
           npm install astro
           npm install send server-destroy
+          echo "PUBLIC_HF_TOKEN=${{ secrets.PUBLIC_HF_TOKEN }}" > .env
           PORT=8087 pm2 restart SAE301 || PORT=8087 pm2 start entry.mjs --name SAE301
