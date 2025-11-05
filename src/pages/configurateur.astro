@@ -139,21 +139,55 @@ import Layout from '../layouts/Layout.astro';
 						</div>
 					</div>
 
-					<!-- Step 1: Sélectionner le matériau -->
+					<!-- Step 1: Sélectionner les matériaux -->
 					<div id="step-1" class="step-content hidden">
-						<h2 class="text-2xl font-bold mb-4">Étape 2 sur 6<br/><span class="text-primary">Sélectionnez le matériau</span></h2>
-						<p class="text-neutral mb-6">Chaque matériau offre une expérience unique</p>
+						<h2 class="text-2xl font-bold mb-4">Étape 2 sur 6<br/><span class="text-primary">Sélectionnez les matériaux</span></h2>
+						<p class="text-neutral mb-6">Choisissez un matériau pour chaque partie de vos lunettes</p>
 						
-						<div id="materials-container" class="space-y-4">
-							<!-- Les matériaux seront chargés dynamiquement depuis PocketBase -->
-							<div class="flex justify-center py-8">
-								<span class="loading loading-spinner loading-lg"></span>
+						<div class="space-y-6">
+							<!-- Matériau Monture -->
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-semibold text-lg">🔲 Matériau de la monture</span>
+								</label>
+								<select id="materiau-monture-select" class="select select-bordered w-full">
+									<option disabled selected>Chargement...</option>
+								</select>
+								<label class="label">
+									<span class="label-text-alt" id="monture-price-label">Prix: +0 €</span>
+								</label>
+							</div>
+
+							<!-- Matériau Branches -->
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-semibold text-lg">🔧 Matériau des branches</span>
+								</label>
+								<select id="materiau-branches-select" class="select select-bordered w-full">
+									<option disabled selected>Chargement...</option>
+								</select>
+								<label class="label">
+									<span class="label-text-alt" id="branches-price-label">Prix: +0 €</span>
+								</label>
+							</div>
+
+							<!-- Matériau Verres -->
+							<div class="form-control">
+								<label class="label">
+									<span class="label-text font-semibold text-lg">👓 Matériau des verres</span>
+								</label>
+								<select id="materiau-verres-select" class="select select-bordered w-full">
+									<option disabled selected>Chargement...</option>
+								</select>
+								<label class="label">
+									<span class="label-text-alt" id="verres-price-label">Prix: +0 €</span>
+								</label>
 							</div>
 						</div>
 
-						<div class="alert alert-warning mt-6">
-							<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-							<span class="text-sm">Série Écaille - Réassort vendredi prochain</span>
+						<div class="alert alert-info mt-6">
+							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+							<span class="text-sm">💡 Chaque matériau offre des propriétés uniques en termes de confort, durabilité et esthétique.</span>
 						</div>
 					</div>
 
@@ -385,15 +419,6 @@ import Layout from '../layouts/Layout.astro';
 								<div class="text-sm">Astuce : Un nom évocateur facilite les ajustements et créations futures.</div>
 							</div>
 						</div>
-
-						<div class="mt-6 space-y-3">
-							<button class="btn btn-outline w-full" id="save-config-btn">
-								💾 Sauvegarder uniquement
-							</button>
-							<button class="btn btn-outline w-full" id="restart-config-btn">
-								🔄 Réinitialiser la configuration
-							</button>
-						</div>
 					</div>
 
 					<!-- Navigation Buttons -->
@@ -409,6 +434,13 @@ import Layout from '../layouts/Layout.astro';
 							<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
 								<path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
 							</svg>
+						</button>
+					</div>
+					
+					<!-- Bouton Réinitialiser (visible sur la dernière étape) -->
+					<div id="final-actions" class="mt-4 hidden">
+						<button class="btn btn-outline w-full" id="restart-config-btn">
+							🔄 Réinitialiser la configuration
 						</button>
 					</div>
 				</div>
@@ -459,7 +491,7 @@ import Layout from '../layouts/Layout.astro';
 									<span class="text-primary" id="total-price">159.00 €</span>
 								</div>
 							</div>
-							<button class="btn btn-primary btn-block mt-4" id="add-to-cart-btn">
+							<button class="btn btn-primary btn-block mt-4" id="add-to-cart-btn" disabled>
 								🛒 Ajouter au panier
 							</button>
 						</div>
@@ -468,6 +500,26 @@ import Layout from '../layouts/Layout.astro';
 			</div>
 		</div>
 	</div>
+
+	<!-- Modal de finalisation -->
+	<dialog id="finish-modal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg mb-4">🎉 Configuration terminée !</h3>
+			<p class="py-4">Que souhaitez-vous faire avec votre création ?</p>
+			
+			<div class="space-y-3">
+				<button class="btn btn-success w-full" id="save-finish-btn">
+					💾 Sauvegarder ma création
+				</button>
+				<button class="btn btn-outline w-full" id="abandon-finish-btn">
+					❌ Abandonner
+				</button>
+			</div>
+		</div>
+		<form method="dialog" class="modal-backdrop">
+			<button>Fermer</button>
+		</form>
+	</dialog>
 
 	<script>
 		// Configuration state
@@ -478,6 +530,11 @@ import Layout from '../layouts/Layout.astro';
 			editionPrice: 159,
 			material: 'acetate',
 			materialPrice: 0,
+			materiaux: {
+				monture: { id: null as string | null, prix: 0, libelle: '' },
+				branches: { id: null as string | null, prix: 0, libelle: '' },
+				verres: { id: null as string | null, prix: 0, libelle: '' }
+			},
 			size: 'M',
 			sizeWidth: 52,
 			largeurPont: null as number | null,
@@ -501,83 +558,135 @@ import Layout from '../layouts/Layout.astro';
 		// Initialize
 		updateStepDisplay();
 		updatePrice();
-		loadMaterials(); // Charger les matériaux depuis PocketBase
+		loadMateriauxSelects(); // Charger les matériaux dans les selects
 
-		// Fonction pour charger les matériaux depuis PocketBase
+		// Fonction pour charger les matériaux dans les menus déroulants
 		import { getMateriaux } from '../JS/pocketbase.js';
 		
-		async function loadMaterials() {
-			const container = document.getElementById('materials-container');
-			if (!container) return;
-
+		async function loadMateriauxSelects() {
 			try {
+				// Récupérer tous les matériaux disponibles
 				const materiaux = await getMateriaux();
 				
-				if (materiaux.length === 0) {
-					container.innerHTML = '<p class="text-center text-neutral">Aucun matériau disponible</p>';
-					return;
+				// Charger matériaux monture
+				const montureSelect = document.getElementById('materiau-monture-select') as HTMLSelectElement;
+				
+				if (montureSelect) {
+					montureSelect.innerHTML = '<option value="">Choisir un matériau...</option>';
+					materiaux.forEach((materiau, index) => {
+						const option = document.createElement('option');
+						option.value = materiau.id;
+						option.textContent = `${materiau.libelle} (+${materiau.prix}€)`;
+						option.setAttribute('data-prix', materiau.prix.toString());
+						option.setAttribute('data-libelle', materiau.libelle);
+						montureSelect.appendChild(option);
+						
+						// Sélectionner le premier par défaut
+						if (index === 0) {
+							option.selected = true;
+							config.materiaux.monture = { id: materiau.id, prix: materiau.prix, libelle: materiau.libelle };
+						}
+					});
 				}
 
-				container.innerHTML = '';
+				// Charger matériaux branches
+				const branchesSelect = document.getElementById('materiau-branches-select') as HTMLSelectElement;
 				
-				materiaux.forEach((materiau, index) => {
-					const isFirst = index === 0;
-					const card = document.createElement('div');
-					card.className = `card bg-base-200 border-2 ${isFirst ? 'border-4 border-primary' : 'border-transparent hover:border-primary'} cursor-pointer transition-all material-card`;
-					card.setAttribute('data-material', materiau.libelle.toLowerCase());
-					card.setAttribute('data-price', materiau.prix.toString());
-					
-					card.innerHTML = `
-						<div class="card-body">
-							<div class="flex justify-between items-start">
-								<div>
-									<h3 class="font-bold text-lg flex items-center gap-2">
-										${materiau.libelle}
-										${isFirst ? '<span class="badge badge-error badge-sm">🔥 Plus vendu</span>' : ''}
-									</h3>
-									<p class="text-sm text-neutral">${materiau.description || 'Matériau de qualité'}</p>
-								</div>
-								<div class="text-right">
-									<p class="text-2xl font-bold">+${materiau.prix} €</p>
-								</div>
-							</div>
-						</div>
-					`;
-					
-					container.appendChild(card);
-					
-					// Si c'est le premier matériau, le définir par défaut
-					if (isFirst) {
-						config.material = materiau.libelle.toLowerCase();
-						config.materialPrice = materiau.prix;
-					}
-				});
+				if (branchesSelect) {
+					branchesSelect.innerHTML = '<option value="">Choisir un matériau...</option>';
+					materiaux.forEach((materiau, index) => {
+						const option = document.createElement('option');
+						option.value = materiau.id;
+						option.textContent = `${materiau.libelle} (+${materiau.prix}€)`;
+						option.setAttribute('data-prix', materiau.prix.toString());
+						option.setAttribute('data-libelle', materiau.libelle);
+						branchesSelect.appendChild(option);
+						
+						// Sélectionner le premier par défaut
+						if (index === 0) {
+							option.selected = true;
+							config.materiaux.branches = { id: materiau.id, prix: materiau.prix, libelle: materiau.libelle };
+						}
+					});
+				}
+
+				// Charger matériaux verres
+				const verresSelect = document.getElementById('materiau-verres-select') as HTMLSelectElement;
 				
-				// Attacher les event listeners après avoir créé les cartes
-				attachMaterialListeners();
+				if (verresSelect) {
+					verresSelect.innerHTML = '<option value="">Choisir un matériau...</option>';
+					materiaux.forEach((materiau, index) => {
+						const option = document.createElement('option');
+						option.value = materiau.id;
+						option.textContent = `${materiau.libelle} (+${materiau.prix}€)`;
+						option.setAttribute('data-prix', materiau.prix.toString());
+						option.setAttribute('data-libelle', materiau.libelle);
+						verresSelect.appendChild(option);
+						
+						// Sélectionner le premier par défaut
+						if (index === 0) {
+							option.selected = true;
+							config.materiaux.verres = { id: materiau.id, prix: materiau.prix, libelle: materiau.libelle };
+						}
+					});
+				}
+
+				// Attacher les event listeners
+				attachMaterialSelectListeners();
+				updatePrice();
 				
 			} catch (error) {
-				console.error('Erreur de chargement des matériaux:', error);
-				container.innerHTML = '<p class="text-center text-error">Erreur de chargement des matériaux</p>';
+				console.error('❌ Erreur de chargement des matériaux:', error);
+				alert('Erreur lors du chargement des matériaux');
 			}
 		}
 
-		// Fonction pour attacher les listeners aux cartes de matériaux
-		function attachMaterialListeners() {
-			document.querySelectorAll('.material-card').forEach(card => {
-				card.addEventListener('click', () => {
-					document.querySelectorAll('.material-card').forEach(c => {
-						c.classList.remove('border-primary', 'border-4');
-						c.classList.add('border-2', 'border-transparent');
-					});
-					card.classList.remove('border-2', 'border-transparent');
-					card.classList.add('border-4', 'border-primary');
-					
-					const cardElement = card as HTMLElement;
-					config.material = cardElement.dataset.material || '';
-					config.materialPrice = parseInt(cardElement.dataset.price || '0');
-					updatePrice();
-				});
+		// Event listeners pour les selects de matériaux
+		function attachMaterialSelectListeners() {
+			const montureSelect = document.getElementById('materiau-monture-select');
+			const branchesSelect = document.getElementById('materiau-branches-select');
+			const verresSelect = document.getElementById('materiau-verres-select');
+
+			montureSelect?.addEventListener('change', (e) => {
+				const select = e.target as HTMLSelectElement;
+				const selectedOption = select.options[select.selectedIndex];
+				const prix = parseInt(selectedOption.getAttribute('data-prix') || '0');
+				const libelle = selectedOption.getAttribute('data-libelle') || '';
+				
+				config.materiaux.monture = { id: select.value, prix, libelle };
+				
+				const priceLabel = document.getElementById('monture-price-label');
+				if (priceLabel) priceLabel.textContent = `Prix: +${prix} €`;
+				
+				updatePrice();
+			});
+
+			branchesSelect?.addEventListener('change', (e) => {
+				const select = e.target as HTMLSelectElement;
+				const selectedOption = select.options[select.selectedIndex];
+				const prix = parseInt(selectedOption.getAttribute('data-prix') || '0');
+				const libelle = selectedOption.getAttribute('data-libelle') || '';
+				
+				config.materiaux.branches = { id: select.value, prix, libelle };
+				
+				const priceLabel = document.getElementById('branches-price-label');
+				if (priceLabel) priceLabel.textContent = `Prix: +${prix} €`;
+				
+				updatePrice();
+			});
+
+			verresSelect?.addEventListener('change', (e) => {
+				const select = e.target as HTMLSelectElement;
+				const selectedOption = select.options[select.selectedIndex];
+				const prix = parseInt(selectedOption.getAttribute('data-prix') || '0');
+				const libelle = selectedOption.getAttribute('data-libelle') || '';
+				
+				config.materiaux.verres = { id: select.value, prix, libelle };
+				
+				const priceLabel = document.getElementById('verres-price-label');
+				if (priceLabel) priceLabel.textContent = `Prix: +${prix} €`;
+				
+				updatePrice();
 			});
 		}
 
@@ -593,6 +702,18 @@ import Layout from '../layouts/Layout.astro';
 			if (currentStep < totalSteps - 1) {
 				currentStep++;
 				updateStepDisplay();
+			} else {
+				// Dernière étape : vérifier la signature et ouvrir le modal
+				if (!config.signature) {
+					alert('⚠️ Veuillez entrer une signature pour votre création avant de terminer.');
+					return;
+				}
+				
+				// Ouvrir le modal de finalisation
+				const finishModal = document.getElementById('finish-modal') as HTMLDialogElement;
+				if (finishModal) {
+					finishModal.showModal();
+				}
 			}
 		});
 
@@ -619,6 +740,17 @@ import Layout from '../layouts/Layout.astro';
 			if (prevBtn) {
 				prevBtn.disabled = currentStep === 0;
 			}
+			
+			// Afficher/masquer le bouton réinitialiser
+			const finalActions = document.getElementById('final-actions');
+			if (finalActions) {
+				if (currentStep === totalSteps - 1) {
+					finalActions.classList.remove('hidden');
+				} else {
+					finalActions.classList.add('hidden');
+				}
+			}
+			
 			if (nextBtn) {
 				if (currentStep === totalSteps - 1) {
 					nextBtn.textContent = '✓ Terminer';
@@ -736,10 +868,16 @@ import Layout from '../layouts/Layout.astro';
 		}
 
 		function updatePrice() {
-			const total = config.editionPrice + config.materialPrice;
+			const materiauxTotal = config.materiaux.monture.prix + config.materiaux.branches.prix + config.materiaux.verres.prix;
+			const total = config.editionPrice + materiauxTotal;
+			
 			document.getElementById('total-price').textContent = total.toFixed(2) + ' €';
 			document.getElementById('edition-label').textContent = config.edition.charAt(0).toUpperCase() + config.edition.slice(1);
-			document.getElementById('material-label').textContent = config.material.charAt(0).toUpperCase() + config.material.slice(1);
+			
+			// Afficher les matériaux sélectionnés
+			const materiauxLabel = `${config.materiaux.monture.libelle || 'N/A'} / ${config.materiaux.branches.libelle || 'N/A'} / ${config.materiaux.verres.libelle || 'N/A'}`;
+			document.getElementById('material-label').textContent = materiauxLabel;
+			
 			document.getElementById('size-label').textContent = `${config.size} (${config.sizeWidth}mm)`;
 		}
 
@@ -749,24 +887,22 @@ import Layout from '../layouts/Layout.astro';
 			config.signature = target.value;
 		});
 
-		// Save configuration
-		import { saveLunette } from '../JS/pocketbase.js';
+		// Save configuration via modal
+		import { saveLunette, addToCart } from '../JS/pocketbase.js';
 		
-		document.getElementById('save-config-btn')?.addEventListener('click', async () => {
-			if (!config.signature) {
-				alert('Veuillez entrer une signature pour votre création');
-				return;
-			}
-			
+		let savedLunetteId: string | null = null; // Pour stocker l'ID de la lunette sauvegardée
+		
+		document.getElementById('save-finish-btn')?.addEventListener('click', async () => {
 			try {
-				const btn = document.getElementById('save-config-btn') as HTMLButtonElement;
+				const btn = document.getElementById('save-finish-btn') as HTMLButtonElement;
 				if (btn) {
 					btn.disabled = true;
 					btn.innerHTML = '<span class="loading loading-spinner"></span> Sauvegarde...';
 				}
 				
 				// Préparer les données pour la sauvegarde
-				const totalPrice = config.editionPrice + config.materialPrice;
+				const materiauxTotal = config.materiaux.monture.prix + config.materiaux.branches.prix + config.materiaux.verres.prix;
+				const totalPrice = config.editionPrice + materiauxTotal;
 				
 				const lunetteData = {
 					signature: config.signature,
@@ -776,6 +912,11 @@ import Layout from '../layouts/Layout.astro';
 					hauteurVerre: config.hauteurVerre,
 					longueurBranche: config.longueurBranche,
 					prix: totalPrice,
+					materiauxIds: {
+						monture: config.materiaux.monture.id,
+						branches: config.materiaux.branches.id,
+						verres: config.materiaux.verres.id
+					},
 					colors: {
 						monture: config.colors.monture,
 						branches: config.colors.branches,
@@ -783,10 +924,23 @@ import Layout from '../layouts/Layout.astro';
 					}
 				};
 				
-				await saveLunette(lunetteData);
+				const savedLunette = await saveLunette(lunetteData);
+				savedLunetteId = savedLunette.id; // Stocker l'ID pour l'ajout au panier
+				
+				// Fermer le modal
+				const finishModal = document.getElementById('finish-modal') as HTMLDialogElement;
+				if (finishModal) {
+					finishModal.close();
+				}
 				
 				// Afficher un message de succès
-				alert('✅ Configuration sauvegardée avec succès !');
+				alert('✅ Configuration sauvegardée avec succès ! Vous pouvez maintenant ajouter au panier.');
+				
+				// Activer le bouton "Ajouter au panier"
+				const addToCartBtn = document.getElementById('add-to-cart-btn') as HTMLButtonElement;
+				if (addToCartBtn) {
+					addToCartBtn.disabled = false;
+				}
 				
 				if (btn) {
 					btn.disabled = false;
@@ -796,11 +950,22 @@ import Layout from '../layouts/Layout.astro';
 				console.error('Erreur de sauvegarde:', error);
 				alert('❌ Erreur lors de la sauvegarde. Veuillez réessayer.');
 				
-				const btn = document.getElementById('save-config-btn') as HTMLButtonElement;
+				const btn = document.getElementById('save-finish-btn') as HTMLButtonElement;
 				if (btn) {
 					btn.disabled = false;
 					btn.innerHTML = '💾 Sauvegarder ma création';
 				}
+			}
+		});
+		
+		// Abandon button in modal
+		document.getElementById('abandon-finish-btn')?.addEventListener('click', () => {
+			const finishModal = document.getElementById('finish-modal') as HTMLDialogElement;
+			if (finishModal) {
+				finishModal.close();
+			}
+			if (confirm('Êtes-vous sûr de vouloir abandonner cette configuration ?')) {
+				location.href = '/';
 			}
 		});
 
@@ -812,9 +977,34 @@ import Layout from '../layouts/Layout.astro';
 		});
 
 		// Add to cart
-		document.getElementById('add-to-cart-btn')?.addEventListener('click', () => {
-			console.log('Adding to cart:', config);
-			alert('Lunettes ajoutées au panier !');
+		document.getElementById('add-to-cart-btn')?.addEventListener('click', async () => {
+			const addToCartBtn = document.getElementById('add-to-cart-btn') as HTMLButtonElement;
+			if (addToCartBtn && addToCartBtn.disabled) {
+				alert('⚠️ Veuillez d\'abord sauvegarder votre configuration en cliquant sur "Terminer".');
+				return;
+			}
+			
+			if (!savedLunetteId) {
+				alert('⚠️ Aucune configuration sauvegardée trouvée.');
+				return;
+			}
+			
+			try {
+				addToCartBtn.disabled = true;
+				addToCartBtn.innerHTML = '<span class="loading loading-spinner"></span> Ajout...';
+				
+				await addToCart(savedLunetteId);
+				
+				alert('✅ Lunettes ajoutées au panier !');
+				
+				// Rediriger vers le panier
+				window.location.href = '/panier';
+			} catch (error: any) {
+				console.error('Erreur d\'ajout au panier:', error);
+				alert('❌ Erreur lors de l\'ajout au panier. Veuillez réessayer.');
+				addToCartBtn.disabled = false;
+				addToCartBtn.innerHTML = '🛒 Ajouter au panier';
+			}
 		});
 
 		// Animate config count

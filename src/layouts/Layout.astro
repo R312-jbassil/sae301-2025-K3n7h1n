@@ -49,10 +49,20 @@ const {
 							<span id="config-badge" class="badge badge-sm badge-primary hidden">Nouveau</span>
 						</a>
 					</li>
-					<li><a href="/#creations" class="text-base-content hover:text-primary">Tes créations</a></li>
+					<li><a href="/ma-galerie" class="text-base-content hover:text-primary">Ma galerie</a></li>
 				</ul>
 			</div>
 			<div class="navbar-end gap-2">
+				<!-- Panier (visible si connecté) -->
+				<a href="/panier" id="cart-link" class="btn btn-ghost btn-circle hidden">
+					<div class="indicator">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+						</svg>
+						<span id="cart-count" class="badge badge-sm badge-primary indicator-item hidden">0</span>
+					</div>
+				</a>
+				
 				<!-- User menu (hidden by default, shown when logged in) -->
 				<div id="user-menu" class="hidden dropdown dropdown-end">
 					<label tabindex="0" class="btn btn-ghost btn-circle avatar">
@@ -65,7 +75,7 @@ const {
 							<span id="user-name-display">Utilisateur</span>
 						</li>
 						<li><a href="/configurateur">Configurer mes lunettes</a></li>
-						<li><a href="/#creations">Mes créations</a></li>
+						<li><a href="/ma-galerie">Ma galerie</a></li>
 						<li><a href="#" id="logout-btn">Déconnexion</a></li>
 					</ul>
 				</div>
@@ -83,7 +93,7 @@ const {
 					<ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52">
 						<li><a href="/#presentation">Présentation</a></li>
 						<li><a href="/configurateur">Configurer</a></li>
-						<li><a href="/#creations">Tes créations</a></li>
+						<li><a href="/ma-galerie">Ma galerie</a></li>
 					</ul>
 				</div>
 			</div>
@@ -108,8 +118,8 @@ const {
 						<h4 class="font-semibold mb-4">Navigation</h4>
 						<ul class="space-y-2">
 							<li><a href="/#presentation" class="link link-hover text-neutral">Présentation</a></li>
-							<li><a href="/#gamme" class="link link-hover text-neutral">Ma gamme</a></li>
-							<li><a href="/#creations" class="link link-hover text-neutral">Mes créations</a></li>
+							<li><a href="/ma-galerie" class="link link-hover text-neutral">Ma galerie</a></li>
+							<li><a href="/configurateur" class="link link-hover text-neutral">Configurer</a></li>
 						</ul>
 					</div>
 					<div>
@@ -166,14 +176,16 @@ const {
 		</button>
 
 		<script>
-			import { pb, isAuthenticated, getCurrentUser, logout } from '../JS/pocketbase.js';
+			import { pb, isAuthenticated, getCurrentUser, logout, getCart } from '../JS/pocketbase.js';
 
 			// Vérifier et afficher l'état de connexion
-			function updateAuthUI() {
+			async function updateAuthUI() {
 				const userMenu = document.getElementById('user-menu');
 				const loginBtn = document.getElementById('login-btn');
 				const userNameDisplay = document.getElementById('user-name-display');
 				const userInitial = document.getElementById('user-initial');
+				const cartLink = document.getElementById('cart-link');
+				const cartCount = document.getElementById('cart-count');
 
 				if (isAuthenticated()) {
 					const user = getCurrentUser();
@@ -181,6 +193,22 @@ const {
 						// Afficher le menu utilisateur
 						userMenu.classList.remove('hidden');
 						loginBtn.classList.add('hidden');
+						
+						// Afficher le lien panier
+						if (cartLink) {
+							cartLink.classList.remove('hidden');
+						}
+						
+						// Récupérer le nombre d'articles dans le panier
+						try {
+							const cartItems = await getCart();
+							if (cartCount && cartItems.length > 0) {
+								cartCount.textContent = cartItems.length.toString();
+								cartCount.classList.remove('hidden');
+							}
+						} catch (error) {
+							console.error('Erreur de récupération du panier:', error);
+						}
 
 						// Mettre à jour le nom et l'initiale
 						userNameDisplay.textContent = user.name || user.email;
@@ -191,6 +219,10 @@ const {
 					if (userMenu && loginBtn) {
 						userMenu.classList.add('hidden');
 						loginBtn.classList.remove('hidden');
+					}
+					// Masquer le lien panier
+					if (cartLink) {
+						cartLink.classList.add('hidden');
 					}
 				}
 			}

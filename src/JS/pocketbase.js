@@ -192,6 +192,32 @@ export async function saveLunette(lunetteData) {
     
     const record = await pb.collection('lunette').create(data);
     console.log('✅ Lunette sauvegardée:', record);
+    
+    // Créer les enregistrements dans les collections intermédiaires
+    if (lunetteData.materiauxIds?.monture) {
+      await pb.collection('materiel_monture').create({
+        id_lunette: record.id,
+        id_materiau: lunetteData.materiauxIds.monture
+      });
+      console.log('✅ Matériau monture enregistré');
+    }
+    
+    if (lunetteData.materiauxIds?.branches) {
+      await pb.collection('materiel_branche').create({
+        id_lunette: record.id,
+        id_materiau: lunetteData.materiauxIds.branches
+      });
+      console.log('✅ Matériau branche enregistré');
+    }
+    
+    if (lunetteData.materiauxIds?.verres) {
+      await pb.collection('materiel_verre').create({
+        id_lunette: record.id,
+        id_materiau: lunetteData.materiauxIds.verres
+      });
+      console.log('✅ Matériau verre enregistré');
+    }
+    
     return record;
   } catch (error) {
     console.error('❌ Erreur de sauvegarde:', error);
@@ -202,9 +228,17 @@ export async function saveLunette(lunetteData) {
 // Récupérer toutes les lunettes de l'utilisateur
 export async function getUserLunettes() {
   try {
+    // Vérifier que l'utilisateur est connecté
+    if (!pb.authStore.model) {
+      throw new Error('Vous devez être connecté pour voir vos lunettes');
+    }
+    
     const records = await pb.collection('lunette').getFullList({
+      filter: `user = "${pb.authStore.model.id}"`,
       sort: '-created',
     });
+    
+    console.log('👓 Lunettes de l\'utilisateur récupérées:', records);
     return records;
   } catch (error) {
     console.error('Erreur de récupération des lunettes:', error);
@@ -233,6 +267,142 @@ export async function getMateriaux() {
     return records;
   } catch (error) {
     console.error('❌ Erreur de récupération des matériaux:', error);
+    throw error;
+  }
+}
+
+// Récupérer les matériaux pour les branches
+export async function getMateriauxBranche() {
+  try {
+    const records = await pb.collection('materiel_branche').getFullList({
+      sort: 'prix',
+      expand: 'materiau',
+    });
+    console.log('🔧 Matériaux branches récupérés:', records);
+    return records;
+  } catch (error) {
+    console.error('❌ Erreur de récupération des matériaux branches:', error);
+    throw error;
+  }
+}
+
+// Récupérer les matériaux pour les verres
+export async function getMateriauxVerre() {
+  try {
+    const records = await pb.collection('materiel_verre').getFullList({
+      sort: 'prix',
+      expand: 'materiau',
+    });
+    console.log('👓 Matériaux verres récupérés:', records);
+    return records;
+  } catch (error) {
+    console.error('❌ Erreur de récupération des matériaux verres:', error);
+    throw error;
+  }
+}
+
+// Récupérer les matériaux pour la monture
+export async function getMateriauxMonture() {
+  try {
+    const records = await pb.collection('materiel_monture').getFullList({
+      sort: 'prix',
+      expand: 'materiau',
+    });
+    console.log('🔲 Matériaux monture récupérés:', records);
+    return records;
+  } catch (error) {
+    console.error('❌ Erreur de récupération des matériaux monture:', error);
+    throw error;
+  }
+}
+
+// Ajouter une lunette au panier (créer une commande)
+export async function addToCart(lunetteId) {
+  try {
+    console.log('🛒 Ajout au panier:', lunetteId);
+    
+    // Vérifier que l'utilisateur est connecté
+    if (!pb.authStore.model) {
+      throw new Error('Vous devez être connecté pour ajouter au panier');
+    }
+    
+    const data = {
+      id_utilisateur: pb.authStore.model.id,
+      id_lunette: lunetteId
+    };
+    
+    const record = await pb.collection('commande2').create(data);
+    console.log('✅ Ajouté au panier:', record);
+    return record;
+  } catch (error) {
+    console.error('❌ Erreur d\'ajout au panier:', error);
+    throw error;
+  }
+}
+
+// Récupérer le panier de l'utilisateur
+export async function getCart() {
+  try {
+    if (!pb.authStore.model) {
+      throw new Error('Vous devez être connecté');
+    }
+    
+    const records = await pb.collection('commande2').getFullList({
+      filter: `id_utilisateur = "${pb.authStore.model.id}"`,
+      expand: 'id_lunette',
+      sort: '-created',
+    });
+    
+    console.log('🛒 Panier récupéré:', records);
+    return records;
+  } catch (error) {
+    console.error('❌ Erreur de récupération du panier:', error);
+    throw error;
+  }
+}
+
+// Supprimer un article du panier
+export async function removeFromCart(commandeId) {
+  try {
+    await pb.collection('commande2').delete(commandeId);
+    console.log('🗑️ Retiré du panier:', commandeId);
+  } catch (error) {
+    console.error('❌ Erreur de suppression du panier:', error);
+    throw error;
+  }
+}
+
+// Récupérer les détails complets d'une lunette avec ses matériaux
+export async function getLunetteDetails(lunetteId) {
+  try {
+    const lunette = await pb.collection('lunette').getOne(lunetteId);
+    
+    // Récupérer les matériaux associés
+    const materiauxMonture = await pb.collection('materiel_monture').getFullList({
+      filter: `id_lunette = "${lunetteId}"`,
+      expand: 'id_materiau',
+    });
+    
+    const materiauxBranche = await pb.collection('materiel_branche').getFullList({
+      filter: `id_lunette = "${lunetteId}"`,
+      expand: 'id_materiau',
+    });
+    
+    const materiauxVerre = await pb.collection('materiel_verre').getFullList({
+      filter: `id_lunette = "${lunetteId}"`,
+      expand: 'id_materiau',
+    });
+    
+    return {
+      ...lunette,
+      materiaux: {
+        monture: materiauxMonture[0]?.expand?.id_materiau || null,
+        branches: materiauxBranche[0]?.expand?.id_materiau || null,
+        verres: materiauxVerre[0]?.expand?.id_materiau || null,
+      }
+    };
+  } catch (error) {
+    console.error('❌ Erreur de récupération des détails:', error);
     throw error;
   }
 }
