@@ -1,13 +1,31 @@
 import { OpenAI } from 'openai';
 
-const client = new OpenAI({
-  baseURL: "https://router.huggingface.co/v1",
-  apiKey: import.meta.env.PUBLIC_HF_TOKEN,
-  dangerouslyAllowBrowser: true,
-});
-
 export async function POST({ request }) {
   try {
+    // Get API key from environment variables (works in both dev and production)
+    const apiKey = import.meta.env.PUBLIC_HF_TOKEN || process.env.PUBLIC_HF_TOKEN;
+    
+    if (!apiKey) {
+      console.error("HuggingFace API token not found in environment variables");
+      return new Response(
+        JSON.stringify({
+          error: "API configuration error: Missing HuggingFace token",
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    // Create client inside the function to access runtime environment variables
+    const client = new OpenAI({
+      baseURL: "https://router.huggingface.co/v1",
+      apiKey: apiKey,
+    });
+
     const { messages } = await request.json();
 
     const systemMessage = {
