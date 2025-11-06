@@ -5,4 +5,5 @@ ID : enzo.locatelli02@edu.univ-fcomte.fr
 mdp : 7YFrL3AeBdQ5ayC
 - URL:https://sae301.enzo-locatelli.fr
 
-erreur rencontrer : l'ia en ligne ne peux pas lire le .env donc ne fonctionne pas 
+erreur rencontrer : l'ia en ligne ne peux pas lire le .env donc ne fonctionne pas
+le système de connexion a été pris du cours avec Mr mabed donc pas par une API  
