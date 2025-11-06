@@ -3,6 +3,8 @@ import { OpenAI } from 'openai';
 export async function POST({ request }) {
   try {
     // Get API key from environment variables (works in both dev and production)
+    console.log(import.meta.env.HF_TOKEN);
+    console.log(process.env.HF_TOKEN);
     const apiKey = import.meta.env.HF_TOKEN || process.env.HF_TOKEN;
     
     if (!apiKey) {
